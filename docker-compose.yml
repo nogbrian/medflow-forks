@@ -37,11 +37,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medflow} -d ${POSTGRES_DB:-medflow}"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U medflow -d medflow"]
+      interval: 5s
       timeout: 5s
-      retries: 10
-      start_period: 60s
+      retries: 12
+      start_period: 30s
     networks:
       - medflow-network
     deploy:
