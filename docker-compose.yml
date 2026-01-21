@@ -189,8 +189,6 @@ services:
       context: ./integration
       dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - "3000:8000"
     depends_on:
       - twenty-server
       - calcom
