@@ -1,0 +1,248 @@
+# =============================================================================
+# MEDFLOW FORKS - Unified Medical Growth Platform
+# =============================================================================
+# Integration of:
+# - Twenty CRM (https://github.com/twentyhq/twenty)
+# - Cal.com (https://github.com/calcom/cal.com)
+# - Chatwoot (https://github.com/chatwoot/chatwoot)
+#
+# Requirements:
+# - Docker & Docker Compose
+# - 8GB+ RAM (KVM8 Hostinger)
+# - GitHub App for deploy
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # SHARED INFRASTRUCTURE
+  # ===========================================================================
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medflow_secret}
+      POSTGRES_MULTIPLE_DATABASES: twenty,calcom,chatwoot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-multi-db.sh:/docker-entrypoint-initdb.d/init-multi-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medflow-network
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medflow-network
+
+  # ===========================================================================
+  # TWENTY CRM
+  # ===========================================================================
+
+  twenty-server:
+    image: twentycrm/twenty:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # Database
+      PG_DATABASE_URL: postgres://${POSTGRES_USER:-medflow}:${POSTGRES_PASSWORD:-medflow_secret}@postgres:5432/twenty
+      # Redis
+      REDIS_URL: redis://redis:6379
+      # Server
+      SERVER_URL: ${TWENTY_SERVER_URL:-http://localhost:3000}
+      FRONT_BASE_URL: ${TWENTY_FRONT_URL:-http://localhost:3001}
+      # Auth
+      ACCESS_TOKEN_SECRET: ${TWENTY_ACCESS_TOKEN_SECRET:-change-me-twenty-access}
+      LOGIN_TOKEN_SECRET: ${TWENTY_LOGIN_TOKEN_SECRET:-change-me-twenty-login}
+      REFRESH_TOKEN_SECRET: ${TWENTY_REFRESH_TOKEN_SECRET:-change-me-twenty-refresh}
+      FILE_TOKEN_SECRET: ${TWENTY_FILE_TOKEN_SECRET:-change-me-twenty-file}
+      # Storage
+      STORAGE_TYPE: local
+      STORAGE_LOCAL_PATH: /app/packages/twenty-server/.local-storage
+    volumes:
+      - twenty_storage:/app/packages/twenty-server/.local-storage
+    networks:
+      - medflow-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.twenty-api.rule=Host(`api.${DOMAIN:-localhost}`) && PathPrefix(`/twenty`)"
+
+  twenty-front:
+    image: twentycrm/twenty:latest
+    restart: unless-stopped
+    depends_on:
+      - twenty-server
+    command: ["yarn", "nx", "start", "twenty-front"]
+    environment:
+      REACT_APP_SERVER_BASE_URL: ${TWENTY_SERVER_URL:-http://localhost:3000}
+    networks:
+      - medflow-network
+
+  # ===========================================================================
+  # CAL.COM
+  # ===========================================================================
+
+  calcom:
+    image: calcom/cal.com:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # Database
+      DATABASE_URL: postgres://${POSTGRES_USER:-medflow}:${POSTGRES_PASSWORD:-medflow_secret}@postgres:5432/calcom
+      DATABASE_DIRECT_URL: postgres://${POSTGRES_USER:-medflow}:${POSTGRES_PASSWORD:-medflow_secret}@postgres:5432/calcom
+      # Redis
+      REDIS_URL: redis://redis:6379
+      # App
+      NEXT_PUBLIC_WEBAPP_URL: ${CALCOM_URL:-http://localhost:3002}
+      NEXTAUTH_URL: ${CALCOM_URL:-http://localhost:3002}
+      NEXTAUTH_SECRET: ${CALCOM_SECRET:-change-me-calcom-secret}
+      CALENDSO_ENCRYPTION_KEY: ${CALCOM_ENCRYPTION_KEY:-change-me-calcom-encryption}
+      # Email (optional)
+      EMAIL_FROM: ${EMAIL_FROM:-noreply@localhost}
+    networks:
+      - medflow-network
+
+  # ===========================================================================
+  # CHATWOOT
+  # ===========================================================================
+
+  chatwoot-rails:
+    image: chatwoot/chatwoot:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: bundle exec rails s -p 3000 -b 0.0.0.0
+    environment:
+      # Database
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: chatwoot
+      POSTGRES_USERNAME: ${POSTGRES_USER:-medflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medflow_secret}
+      # Redis
+      REDIS_URL: redis://redis:6379
+      # Rails
+      RAILS_ENV: production
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET:-change-me-chatwoot-secret-at-least-64-chars-long-for-production}
+      FRONTEND_URL: ${CHATWOOT_URL:-http://localhost:3003}
+      # Mailer
+      MAILER_SENDER_EMAIL: ${EMAIL_FROM:-noreply@localhost}
+      SMTP_ADDRESS: ${SMTP_HOST:-localhost}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_DOMAIN: ${SMTP_DOMAIN:-localhost}
+      # Features
+      ENABLE_ACCOUNT_SIGNUP: "false"
+    volumes:
+      - chatwoot_storage:/app/storage
+    networks:
+      - medflow-network
+
+  chatwoot-sidekiq:
+    image: chatwoot/chatwoot:latest
+    restart: unless-stopped
+    depends_on:
+      - chatwoot-rails
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: chatwoot
+      POSTGRES_USERNAME: ${POSTGRES_USER:-medflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medflow_secret}
+      REDIS_URL: redis://redis:6379
+      RAILS_ENV: production
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET:-change-me-chatwoot-secret-at-least-64-chars-long-for-production}
+    networks:
+      - medflow-network
+
+  # ===========================================================================
+  # INTEGRATION LAYER
+  # ===========================================================================
+
+  integration:
+    build:
+      context: ./integration
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - twenty-server
+      - calcom
+      - chatwoot-rails
+    environment:
+      # Database
+      DATABASE_URL: postgres://${POSTGRES_USER:-medflow}:${POSTGRES_PASSWORD:-medflow_secret}@postgres:5432/integration
+      # Redis
+      REDIS_URL: redis://redis:6379
+      # Service URLs
+      TWENTY_API_URL: http://twenty-server:3000
+      CALCOM_API_URL: http://calcom:3000
+      CHATWOOT_API_URL: http://chatwoot-rails:3000
+      # Secrets
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt-secret}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-change-me-webhook-secret}
+    networks:
+      - medflow-network
+
+  # ===========================================================================
+  # REVERSE PROXY
+  # ===========================================================================
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - nginx_certs:/etc/nginx/certs
+    depends_on:
+      - twenty-front
+      - calcom
+      - chatwoot-rails
+      - integration
+    networks:
+      - medflow-network
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+volumes:
+  postgres_data:
+  redis_data:
+  twenty_storage:
+  chatwoot_storage:
+  nginx_certs:
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+networks:
+  medflow-network:
+    driver: bridge
