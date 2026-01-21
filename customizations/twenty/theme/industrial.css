@@ -1,0 +1,584 @@
+/**
+ * MedFlow Industrial Theme - Twenty CRM Override
+ *
+ * Este arquivo sobrescreve os estilos padrão do Twenty CRM
+ * para aplicar o Design System Industrial.
+ *
+ * Aplicação: Inject via Twenty's custom CSS ou mount no container Docker
+ */
+
+/* =============================================================================
+   CSS CUSTOM PROPERTIES (TOKENS)
+   ============================================================================= */
+
+:root {
+  /* Cores Industriais */
+  --color-paper: #F2F0E9;
+  --color-ink: #111111;
+  --color-graphite: #000000;
+  --color-accent-orange: #F24E1E;
+  --color-accent-blue: #0047AB;
+  --color-steel: #666666;
+  --color-white: #FFFFFF;
+
+  /* Mapeamento para variáveis do Twenty */
+  --twenty-background-color-primary: var(--color-paper);
+  --twenty-background-color-secondary: var(--color-white);
+  --twenty-border-color-medium: var(--color-graphite);
+  --twenty-accent-primary: var(--color-accent-orange);
+  --twenty-accent-secondary: var(--color-accent-blue);
+  --twenty-font-color-primary: var(--color-ink);
+  --twenty-font-color-secondary: var(--color-steel);
+
+  /* Tipografia */
+  --font-display: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Sombras Industrial */
+  --shadow-hard: 4px 4px 0px 0px var(--color-graphite);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--color-graphite);
+  --shadow-hard-orange: 4px 4px 0px 0px var(--color-accent-orange);
+  --shadow-hard-blue: 4px 4px 0px 0px var(--color-accent-blue);
+
+  /* Bordas */
+  --border-width: 2px;
+  --border-style: solid;
+  --border-color: var(--color-graphite);
+
+  /* CRÍTICO: Sem border-radius */
+  --border-radius-none: 0px;
+  --border-radius-sm: 0px;
+  --border-radius-md: 0px;
+  --border-radius-lg: 0px;
+  --border-radius-full: 0px;
+}
+
+/* =============================================================================
+   RESET: REMOVER BORDER-RADIUS GLOBAL
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+/* =============================================================================
+   LAYOUT BASE
+   ============================================================================= */
+
+body {
+  background-color: var(--color-paper) !important;
+  font-family: var(--font-body) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Sidebar do Twenty */
+[data-testid="left-panel"],
+.left-panel,
+nav[role="navigation"] {
+  background-color: var(--color-white) !important;
+  border-right: var(--border-width) var(--border-style) var(--border-color) !important;
+}
+
+/* Main content area */
+main,
+[data-testid="main-content"],
+.main-content {
+  background-color: var(--color-paper) !important;
+}
+
+/* =============================================================================
+   TIPOGRAFIA
+   ============================================================================= */
+
+/* Headlines - Inter Tight */
+h1, h2, h3, h4, h5, h6,
+.title,
+[class*="title"],
+[class*="heading"] {
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  text-transform: uppercase !important;
+}
+
+h1 { font-size: 2rem !important; }
+h2 { font-size: 1.5rem !important; }
+h3 { font-size: 1.25rem !important; }
+h4 { font-size: 1rem !important; }
+
+/* Dados e métricas - JetBrains Mono */
+.metric,
+.data,
+.number,
+.count,
+.amount,
+.date,
+.time,
+.id,
+.code,
+[class*="metric"],
+[class*="count"],
+[class*="amount"],
+[class*="number"],
+table td:first-child,
+code,
+pre {
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  letter-spacing: 0 !important;
+}
+
+/* =============================================================================
+   BOTÕES
+   ============================================================================= */
+
+button,
+[role="button"],
+.button,
+[class*="button"],
+[class*="Button"],
+a[class*="button"],
+input[type="submit"],
+input[type="button"] {
+  background-color: var(--color-ink) !important;
+  color: var(--color-white) !important;
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+  box-shadow: var(--shadow-hard) !important;
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.75rem 1.5rem !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+button:hover,
+[role="button"]:hover,
+.button:hover,
+[class*="button"]:hover,
+[class*="Button"]:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0px 0px var(--color-graphite) !important;
+}
+
+button:active,
+[role="button"]:active,
+.button:active,
+[class*="button"]:active,
+[class*="Button"]:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0px 0px var(--color-graphite) !important;
+}
+
+/* Botão primário (ação principal) */
+button[class*="primary"],
+[class*="button-primary"],
+[class*="ButtonPrimary"],
+.primary-button {
+  background-color: var(--color-accent-orange) !important;
+  box-shadow: var(--shadow-hard-orange) !important;
+}
+
+button[class*="primary"]:hover {
+  box-shadow: 6px 6px 0px 0px var(--color-accent-orange) !important;
+}
+
+/* Botão secundário */
+button[class*="secondary"],
+[class*="button-secondary"],
+[class*="ButtonSecondary"],
+.secondary-button {
+  background-color: var(--color-white) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Botão ghost */
+button[class*="ghost"],
+[class*="button-ghost"],
+.ghost-button {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+button[class*="ghost"]:hover {
+  background-color: var(--color-paper) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* =============================================================================
+   INPUTS E FORMS
+   ============================================================================= */
+
+input,
+textarea,
+select,
+[class*="input"],
+[class*="Input"],
+[class*="select"],
+[class*="Select"],
+[class*="textarea"] {
+  background-color: var(--color-white) !important;
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+  font-family: var(--font-body) !important;
+  padding: 0.75rem 1rem !important;
+  color: var(--color-ink) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+[class*="input"]:focus,
+[class*="Input"]:focus {
+  outline: none !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  border-color: var(--color-accent-blue) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-steel) !important;
+  font-style: italic !important;
+}
+
+label,
+[class*="label"],
+[class*="Label"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: var(--color-steel) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* =============================================================================
+   CARDS
+   ============================================================================= */
+
+[class*="card"],
+[class*="Card"],
+.card,
+[data-testid*="card"],
+article {
+  background-color: var(--color-white) !important;
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+  box-shadow: var(--shadow-hard) !important;
+  padding: 1.5rem !important;
+}
+
+[class*="card"]:hover,
+[class*="Card"]:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0px 0px var(--color-graphite) !important;
+}
+
+/* =============================================================================
+   TABELAS
+   ============================================================================= */
+
+table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-family: var(--font-body) !important;
+}
+
+table th {
+  background-color: var(--color-ink) !important;
+  color: var(--color-white) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  padding: 1rem !important;
+  text-align: left !important;
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+}
+
+table td {
+  padding: 1rem !important;
+  border: 1px solid var(--color-graphite) !important;
+  background-color: var(--color-white) !important;
+}
+
+table tr:hover td {
+  background-color: var(--color-paper) !important;
+}
+
+/* =============================================================================
+   BADGES / TAGS
+   ============================================================================= */
+
+[class*="badge"],
+[class*="Badge"],
+[class*="tag"],
+[class*="Tag"],
+[class*="chip"],
+[class*="Chip"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  padding: 0.25rem 0.5rem !important;
+  border: 1px solid var(--color-graphite) !important;
+  background-color: var(--color-paper) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Badge de sucesso */
+[class*="badge"][class*="success"],
+[class*="Badge"][class*="success"],
+[class*="badge-green"],
+[class*="green"] {
+  background-color: #10B981 !important;
+  color: var(--color-white) !important;
+  border-color: #059669 !important;
+}
+
+/* Badge de warning */
+[class*="badge"][class*="warning"],
+[class*="Badge"][class*="warning"],
+[class*="badge-orange"],
+[class*="orange"] {
+  background-color: var(--color-accent-orange) !important;
+  color: var(--color-white) !important;
+  border-color: #DC2626 !important;
+}
+
+/* Badge de info */
+[class*="badge"][class*="info"],
+[class*="Badge"][class*="info"],
+[class*="badge-blue"],
+[class*="blue"] {
+  background-color: var(--color-accent-blue) !important;
+  color: var(--color-white) !important;
+  border-color: #1E40AF !important;
+}
+
+/* =============================================================================
+   MODALS / DIALOGS
+   ============================================================================= */
+
+[class*="modal"],
+[class*="Modal"],
+[class*="dialog"],
+[class*="Dialog"],
+[role="dialog"] {
+  background-color: var(--color-white) !important;
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+  box-shadow: 8px 8px 0px 0px var(--color-graphite) !important;
+}
+
+/* Modal overlay */
+[class*="overlay"],
+[class*="Overlay"],
+[class*="backdrop"] {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* =============================================================================
+   DROPDOWN / MENUS
+   ============================================================================= */
+
+[class*="dropdown"],
+[class*="Dropdown"],
+[class*="menu"],
+[class*="Menu"],
+[role="menu"] {
+  background-color: var(--color-white) !important;
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+  box-shadow: var(--shadow-hard) !important;
+}
+
+[class*="dropdown"] [class*="item"],
+[class*="menu"] [class*="item"],
+[role="menuitem"] {
+  padding: 0.75rem 1rem !important;
+  font-family: var(--font-body) !important;
+  border-bottom: 1px solid var(--color-paper) !important;
+}
+
+[class*="dropdown"] [class*="item"]:hover,
+[class*="menu"] [class*="item"]:hover,
+[role="menuitem"]:hover {
+  background-color: var(--color-paper) !important;
+}
+
+/* =============================================================================
+   AVATARS
+   ============================================================================= */
+
+[class*="avatar"],
+[class*="Avatar"],
+img[class*="avatar"],
+img[class*="profile"] {
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+  box-shadow: 2px 2px 0px 0px var(--color-graphite) !important;
+}
+
+/* =============================================================================
+   SCROLLBARS
+   ============================================================================= */
+
+::-webkit-scrollbar {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-paper) !important;
+  border-left: 1px solid var(--color-graphite) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-graphite) !important;
+  border: 2px solid var(--color-paper) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-steel) !important;
+}
+
+/* =============================================================================
+   TWENTY CRM ESPECÍFICO - COMPONENTES
+   ============================================================================= */
+
+/* Record Board (Kanban) */
+[data-testid="record-board"],
+.record-board {
+  background-color: var(--color-paper) !important;
+}
+
+[data-testid="record-board-column"],
+.record-board-column {
+  background-color: var(--color-white) !important;
+  border: var(--border-width) var(--border-style) var(--color-graphite) !important;
+}
+
+/* Pipeline cards */
+[data-testid="record-board-card"],
+.record-board-card,
+[class*="opportunity-card"] {
+  background-color: var(--color-white) !important;
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+}
+
+/* People/Companies list */
+[data-testid="record-table"],
+.record-table {
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+}
+
+/* Search bar */
+[data-testid="search-input"],
+.search-input,
+input[type="search"] {
+  border: var(--border-width) var(--border-style) var(--border-color) !important;
+  background-color: var(--color-white) !important;
+}
+
+/* =============================================================================
+   ESTADOS ESPECIAIS
+   ============================================================================= */
+
+/* Estado de hover geral */
+*:hover {
+  transition: all 0.1s ease !important;
+}
+
+/* Estado disabled */
+*:disabled,
+[aria-disabled="true"],
+.disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+/* Estado de loading */
+[class*="loading"],
+[class*="Loading"],
+[class*="spinner"],
+[class*="Spinner"] {
+  border-color: var(--color-steel) !important;
+  border-top-color: var(--color-accent-orange) !important;
+}
+
+/* =============================================================================
+   ANIMAÇÕES INDUSTRIAIS
+   ============================================================================= */
+
+@keyframes industrial-pulse {
+  0%, 100% { box-shadow: var(--shadow-hard); }
+  50% { box-shadow: 6px 6px 0px 0px var(--color-graphite); }
+}
+
+@keyframes industrial-slide {
+  from { transform: translateY(-4px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Aplicar animação em elementos que aparecem */
+[class*="enter"],
+[class*="Enter"],
+[data-state="open"] {
+  animation: industrial-slide 0.2s ease-out !important;
+}
+
+/* =============================================================================
+   PRINT STYLES
+   ============================================================================= */
+
+@media print {
+  * {
+    box-shadow: none !important;
+    border-color: #000 !important;
+  }
+
+  body {
+    background-color: #fff !important;
+  }
+}
+
+/* =============================================================================
+   DARK MODE OVERRIDE (desabilitar dark mode, forçar Industrial)
+   ============================================================================= */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #F2F0E9 !important;
+    --color-ink: #111111 !important;
+    --color-white: #FFFFFF !important;
+  }
+
+  body {
+    background-color: var(--color-paper) !important;
+    color: var(--color-ink) !important;
+  }
+}
+
+/* =============================================================================
+   RESPONSIVIDADE
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  button,
+  [role="button"],
+  .button {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  [class*="card"],
+  [class*="Card"] {
+    box-shadow: var(--shadow-hard-sm) !important;
+  }
+
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1rem !important; }
+}

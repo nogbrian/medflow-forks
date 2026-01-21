@@ -1,0 +1,257 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * MedFlow Industrial Design System
+ * Estilo: Industrial / Suíço
+ */
+
+/* =========================================
+   FONTS (Google Fonts)
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* =========================================
+   BASE LAYER
+   ========================================= */
+@layer base {
+  :root {
+    /* Materiais */
+    --color-paper: #F2F0E9;
+    --color-ink: #111111;
+    --color-graphite: #000000;
+    --color-accent-orange: #F24E1E;
+    --color-accent-blue: #0047AB;
+    --color-steel: #666666;
+  }
+
+  html {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+  }
+
+  /* Seleção de texto */
+  ::selection {
+    @apply bg-accent-orange text-white;
+  }
+
+  /* Scrollbar industrial */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-paper;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink;
+  }
+
+  /* Focus ring industrial */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-accent-orange ring-offset-2 ring-offset-paper;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-balance font-bold tracking-tight;
+  }
+
+  /* Body text */
+  p {
+    @apply text-pretty leading-relaxed;
+  }
+
+  /* Dados numéricos */
+  [data-numeric], .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    @apply font-mono;
+  }
+}
+
+/* =========================================
+   COMPONENT LAYER
+   ========================================= */
+@layer components {
+  /* Botão Industrial Primário */
+  .btn-industrial {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply bg-ink text-white border border-ink;
+    @apply px-6 py-3 font-medium text-sm uppercase tracking-wide;
+    @apply shadow-hard-orange;
+    @apply transition-all duration-fast;
+    border-radius: 0;
+  }
+
+  .btn-industrial:hover {
+    @apply bg-accent-orange border-accent-orange;
+  }
+
+  .btn-industrial:active {
+    @apply translate-x-0.5 translate-y-0.5 shadow-hard-orange-active;
+  }
+
+  /* Botão Industrial Secundário */
+  .btn-industrial-secondary {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply bg-white text-ink border border-ink;
+    @apply px-6 py-3 font-medium text-sm uppercase tracking-wide;
+    @apply shadow-hard;
+    @apply transition-all duration-fast;
+    border-radius: 0;
+  }
+
+  .btn-industrial-secondary:hover {
+    @apply bg-paper;
+  }
+
+  .btn-industrial-secondary:active {
+    @apply translate-x-0.5 translate-y-0.5 shadow-hard-active;
+  }
+
+  /* Botão Ghost */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply bg-transparent text-ink;
+    @apply px-4 py-2 font-medium text-sm uppercase tracking-wide;
+    @apply transition-colors duration-fast;
+    @apply hover:text-accent-orange;
+  }
+
+  /* Card Industrial */
+  .card-industrial {
+    @apply bg-white border border-graphite p-6;
+    @apply relative;
+  }
+
+  /* Card com dobra decorativa */
+  .card-industrial-folded::after {
+    content: "";
+    @apply absolute top-0 right-0;
+    border-width: 0 16px 16px 0;
+    border-style: solid;
+    border-color: var(--color-paper) var(--color-paper) transparent transparent;
+  }
+
+  /* Input Industrial */
+  .input-industrial {
+    @apply w-full bg-white border border-graphite px-4 py-3;
+    @apply text-ink placeholder:text-steel;
+    @apply transition-colors duration-fast;
+    @apply focus:border-accent-orange focus:ring-0;
+    border-radius: 0;
+  }
+
+  /* Label Industrial */
+  .label-industrial {
+    @apply block font-mono text-label-sm uppercase text-steel mb-2;
+  }
+
+  /* Badge Industrial */
+  .badge-industrial {
+    @apply inline-flex items-center gap-1.5;
+    @apply bg-white border border-graphite px-2 py-1;
+    @apply font-mono text-label-sm uppercase;
+  }
+
+  .badge-industrial-active {
+    @apply bg-ink text-white border-ink;
+  }
+
+  .badge-industrial-warning {
+    @apply bg-accent-orange text-white border-accent-orange;
+  }
+
+  /* Divider */
+  .divider-industrial {
+    @apply border-t border-graphite;
+  }
+
+  /* Estrutura de Grid */
+  .grid-industrial {
+    @apply grid divide-x divide-graphite border-x border-graphite;
+  }
+
+  /* Métrica (número grande) */
+  .metric-value {
+    @apply font-sans text-5xl font-bold tracking-tighter tabular-nums;
+  }
+
+  .metric-label {
+    @apply font-mono text-label-sm uppercase text-steel;
+  }
+
+  /* Status indicator */
+  .status-dot {
+    @apply size-2 rounded-none;
+  }
+
+  .status-dot-active {
+    @apply bg-accent-orange;
+  }
+
+  .status-dot-inactive {
+    @apply bg-steel;
+  }
+
+  /* Table Industrial */
+  .table-industrial {
+    @apply w-full border-collapse;
+  }
+
+  .table-industrial th {
+    @apply text-left font-mono text-label-sm uppercase text-steel;
+    @apply px-4 py-3 border-b border-graphite bg-paper;
+  }
+
+  .table-industrial td {
+    @apply px-4 py-3 border-b border-graphite;
+  }
+
+  .table-industrial tr:hover td {
+    @apply bg-paper/50;
+  }
+}
+
+/* =========================================
+   UTILITY LAYER
+   ========================================= */
+@layer utilities {
+  /* Tracking customizado para títulos */
+  .tracking-tighter-industrial {
+    letter-spacing: -0.04em;
+  }
+
+  /* Texto monoespaçado para dados */
+  .text-data {
+    @apply font-mono tabular-nums;
+  }
+
+  /* Container com borda estrutural */
+  .border-structure {
+    @apply border border-graphite;
+  }
+
+  /* Animação de hover sutil */
+  .hover-lift {
+    @apply transition-transform duration-fast;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-0.5;
+  }
+
+  /* Grid pattern background */
+  .bg-grid {
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Cpath d='M0 0h40v1H0zM0 0h1v40H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+}

@@ -16,9 +16,9 @@ from typing import Any
 from agno.agent import Agent
 
 from agents.base import get_model
-from core.logging import get_logger
+import logging
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class AgentType(str, Enum):

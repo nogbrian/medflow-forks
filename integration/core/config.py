@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     chatwoot_api_url: str = "http://chatwoot-rails:3000"
     chatwoot_api_key: str | None = None
 
+    # LLM Configuration
+    llm_provider: str = "anthropic"  # anthropic, openai, google
+    model_smart: str = "claude-sonnet-4-5-20250514"  # For complex reasoning
+    model_fast: str = "claude-haiku-4-20250514"  # For routing/simple tasks
+
     # LLM Keys
     anthropic_api_key: str | None = None
     openai_api_key: str | None = None
@@ -52,8 +57,10 @@ class Settings(BaseSettings):
     # Webhooks
     webhook_secret: str = "change-me-webhook-secret"
 
-    # CORS
-    cors_origins: list[str] = ["*"]
+    # CORS - Configure properly for production!
+    # In dev: ["*"]
+    # In prod: ["https://your-domain.com"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]
 
     @property
     def is_development(self) -> bool:

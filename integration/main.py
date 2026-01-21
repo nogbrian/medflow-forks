@@ -9,24 +9,118 @@ Unified API that integrates:
 - Creative Studio
 """
 
+import logging
+import time
 from contextlib import asynccontextmanager
+from typing import Callable
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.config import get_settings
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO if settings.is_production else logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+
+
+# =============================================================================
+# SECURITY MIDDLEWARE
+# =============================================================================
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Add security headers to all responses."""
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        response = await call_next(request)
+
+        # Security headers
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+        # Remove server header
+        if "server" in response.headers:
+            del response.headers["server"]
+
+        # Content Security Policy for API
+        if settings.is_production:
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+        return response
+
+
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    """Log all requests with timing."""
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        start_time = time.time()
+
+        # Generate request ID
+        request_id = request.headers.get("X-Request-ID", f"req-{int(start_time * 1000)}")
+
+        # Log request
+        logger.info(
+            f"[{request_id}] {request.method} {request.url.path} "
+            f"client={request.client.host if request.client else 'unknown'}"
+        )
+
+        try:
+            response = await call_next(request)
+            duration = time.time() - start_time
+
+            # Log response
+            logger.info(
+                f"[{request_id}] {request.method} {request.url.path} "
+                f"status={response.status_code} duration={duration:.3f}s"
+            )
+
+            # Add timing header
+            response.headers["X-Request-ID"] = request_id
+            response.headers["X-Response-Time"] = f"{duration:.3f}s"
+
+            return response
+
+        except Exception as e:
+            duration = time.time() - start_time
+            logger.error(
+                f"[{request_id}] {request.method} {request.url.path} "
+                f"error={str(e)} duration={duration:.3f}s"
+            )
+            raise
+
+
+# =============================================================================
+# APPLICATION SETUP
+# =============================================================================
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     # Startup
-    print(f"Starting {settings.app_name} ({settings.app_env})")
+    logger.info(f"Starting {settings.app_name} ({settings.app_env})")
+
+    # Validate critical settings
+    if settings.jwt_secret == "change-me-jwt-secret":
+        logger.warning("WARNING: Using default JWT secret. Set JWT_SECRET in production!")
+
+    if settings.webhook_secret == "change-me-webhook-secret":
+        logger.warning("WARNING: Using default webhook secret. Set WEBHOOK_SECRET in production!")
+
     yield
+
     # Shutdown
-    print("Shutting down")
+    logger.info("Shutting down")
 
 
 app = FastAPI(
@@ -36,19 +130,53 @@ app = FastAPI(
     lifespan=lifespan,
     docs_url="/docs" if settings.is_development else None,
     redoc_url="/redoc" if settings.is_development else None,
+    # Disable automatic OpenAPI in production for security
+    openapi_url="/openapi.json" if settings.is_development else None,
 )
 
-# CORS
+
+# Add middleware (order matters - first added = last executed)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestLoggingMiddleware)
+
+# CORS - configured per environment
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    expose_headers=["X-Request-ID", "X-Response-Time"],
 )
 
 
-# Health check
+# =============================================================================
+# ERROR HANDLERS
+# =============================================================================
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler - don't leak internal errors."""
+    logger.exception(f"Unhandled error: {exc}")
+
+    if settings.is_development:
+        return JSONResponse(
+            status_code=500,
+            content={"detail": str(exc), "type": type(exc).__name__},
+        )
+
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+    )
+
+
+# =============================================================================
+# HEALTH & STATUS
+# =============================================================================
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
@@ -57,11 +185,12 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    """Root endpoint - redirect to docs or dashboard."""
+    """Root endpoint - service info."""
     return {
         "name": "MedFlow Integration API",
         "version": "1.0.0",
-        "docs": "/docs",
+        "environment": settings.app_env,
+        "docs": "/docs" if settings.is_development else None,
         "services": {
             "crm": "/crm/",
             "agenda": "/agenda/",
@@ -75,7 +204,7 @@ async def root():
 # IMPORT ROUTES (lazy to avoid circular imports)
 # =============================================================================
 
-from api.routes import auth, clinics, agents, creative_lab, sync
+from api.routes import auth, clinics, agents, creative_lab, sync, navigation, branding
 
 # Auth & Users
 app.include_router(auth.router, prefix="/api", tags=["Auth"])
@@ -91,3 +220,9 @@ app.include_router(creative_lab.router, prefix="/api", tags=["Creative Lab"])
 
 # Service Sync
 app.include_router(sync.router, prefix="/api", tags=["Sync"])
+
+# Cross-Service Navigation
+app.include_router(navigation.router, prefix="/api", tags=["Navigation"])
+
+# Branding (White-label themes)
+app.include_router(branding.router, prefix="/api", tags=["Branding"])

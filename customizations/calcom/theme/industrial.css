@@ -1,0 +1,605 @@
+/**
+ * MedFlow Industrial Theme - Cal.com Override
+ *
+ * Este arquivo sobrescreve os estilos padrão do Cal.com
+ * para aplicar o Design System Industrial.
+ *
+ * Aplicação: Via Cal.com custom CSS ou environment variables
+ */
+
+/* =============================================================================
+   CSS CUSTOM PROPERTIES (TOKENS)
+   ============================================================================= */
+
+:root {
+  /* Cores Industriais */
+  --color-paper: #F2F0E9;
+  --color-ink: #111111;
+  --color-graphite: #000000;
+  --color-accent-orange: #F24E1E;
+  --color-accent-blue: #0047AB;
+  --color-steel: #666666;
+  --color-white: #FFFFFF;
+
+  /* Mapeamento para variáveis do Cal.com */
+  --cal-bg: var(--color-paper);
+  --cal-bg-emphasis: var(--color-white);
+  --cal-bg-subtle: var(--color-paper);
+  --cal-bg-muted: var(--color-paper);
+  --cal-bg-inverted: var(--color-ink);
+
+  --cal-border: var(--color-graphite);
+  --cal-border-emphasis: var(--color-graphite);
+  --cal-border-subtle: var(--color-steel);
+
+  --cal-text: var(--color-ink);
+  --cal-text-emphasis: var(--color-ink);
+  --cal-text-subtle: var(--color-steel);
+  --cal-text-muted: var(--color-steel);
+  --cal-text-inverted: var(--color-white);
+
+  --cal-brand: var(--color-accent-orange);
+  --cal-brand-emphasis: #DC2626;
+  --cal-brand-subtle: rgba(242, 78, 30, 0.1);
+  --cal-brand-text: var(--color-white);
+
+  /* Tipografia */
+  --font-display: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Sombras Industrial */
+  --shadow-hard: 4px 4px 0px 0px var(--color-graphite);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--color-graphite);
+  --shadow-hard-orange: 4px 4px 0px 0px var(--color-accent-orange);
+
+  /* Bordas - CRÍTICO: Sem border-radius */
+  --border-radius: 0px;
+  --border-radius-sm: 0px;
+  --border-radius-md: 0px;
+  --border-radius-lg: 0px;
+  --cal-border-radius: 0px;
+}
+
+/* =============================================================================
+   RESET: REMOVER BORDER-RADIUS GLOBAL
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+/* =============================================================================
+   LAYOUT BASE
+   ============================================================================= */
+
+body,
+html {
+  background-color: var(--color-paper) !important;
+  font-family: var(--font-body) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Main container */
+main,
+[class*="main"],
+.main-container {
+  background-color: var(--color-paper) !important;
+}
+
+/* Sidebar */
+aside,
+[class*="sidebar"],
+nav {
+  background-color: var(--color-white) !important;
+  border-right: 2px solid var(--color-graphite) !important;
+}
+
+/* =============================================================================
+   TIPOGRAFIA
+   ============================================================================= */
+
+/* Headlines */
+h1, h2, h3, h4, h5, h6,
+[class*="title"],
+[class*="heading"],
+[class*="Title"],
+[class*="Heading"] {
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  text-transform: uppercase !important;
+  color: var(--color-ink) !important;
+}
+
+h1 { font-size: 2rem !important; }
+h2 { font-size: 1.5rem !important; }
+h3 { font-size: 1.25rem !important; }
+
+/* Dados e horários - Mono */
+time,
+.time,
+.date,
+.duration,
+[class*="time"],
+[class*="Time"],
+[class*="date"],
+[class*="Date"],
+[class*="duration"],
+[class*="Duration"],
+[class*="slot"],
+code,
+pre {
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  letter-spacing: 0 !important;
+}
+
+/* =============================================================================
+   BOOKING CALENDAR
+   ============================================================================= */
+
+/* Calendar container */
+[class*="calendar"],
+[class*="Calendar"],
+[data-testid*="calendar"] {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+}
+
+/* Calendar header (month/year) */
+[class*="calendar"] [class*="header"],
+[class*="Calendar"] [class*="Header"],
+.calendar-header {
+  background-color: var(--color-ink) !important;
+  color: var(--color-white) !important;
+  padding: 1rem !important;
+  font-family: var(--font-display) !important;
+  text-transform: uppercase !important;
+}
+
+/* Day names (Sun, Mon, etc) */
+[class*="weekday"],
+[class*="Weekday"],
+[class*="day-name"],
+.day-name {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: var(--color-steel) !important;
+}
+
+/* Day cells */
+[class*="calendar"] button,
+[class*="Calendar"] button,
+.day-cell {
+  border: 1px solid var(--color-graphite) !important;
+  font-family: var(--font-mono) !important;
+  transition: all 0.1s ease !important;
+}
+
+/* Available day */
+[class*="calendar"] button:not([disabled]),
+[class*="available"],
+.day-available {
+  background-color: var(--color-white) !important;
+  color: var(--color-ink) !important;
+}
+
+[class*="calendar"] button:not([disabled]):hover {
+  background-color: var(--color-paper) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  transform: translate(-1px, -1px) !important;
+}
+
+/* Selected day */
+[class*="selected"],
+[aria-selected="true"],
+.day-selected {
+  background-color: var(--color-accent-orange) !important;
+  color: var(--color-white) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+}
+
+/* Disabled/unavailable day */
+[class*="calendar"] button[disabled],
+[class*="disabled"],
+.day-disabled {
+  background-color: var(--color-paper) !important;
+  color: var(--color-steel) !important;
+  opacity: 0.5 !important;
+}
+
+/* Today indicator */
+[class*="today"],
+.day-today {
+  border: 2px solid var(--color-accent-blue) !important;
+  font-weight: 700 !important;
+}
+
+/* =============================================================================
+   TIME SLOTS
+   ============================================================================= */
+
+/* Time slots container */
+[class*="time-slots"],
+[class*="TimeSlots"],
+[class*="slots"],
+.time-slots {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  padding: 1rem !important;
+}
+
+/* Individual time slot */
+[class*="time-slot"],
+[class*="TimeSlot"],
+[class*="slot-button"],
+.time-slot {
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  padding: 0.75rem 1rem !important;
+  margin: 0.25rem 0 !important;
+  cursor: pointer !important;
+  transition: all 0.1s ease !important;
+}
+
+[class*="time-slot"]:hover,
+[class*="TimeSlot"]:hover,
+.time-slot:hover {
+  background-color: var(--color-paper) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  transform: translate(-2px, -2px) !important;
+}
+
+/* Selected time slot */
+[class*="time-slot"][class*="selected"],
+[class*="TimeSlot"][aria-selected="true"],
+.time-slot-selected {
+  background-color: var(--color-accent-orange) !important;
+  color: var(--color-white) !important;
+  box-shadow: var(--shadow-hard-orange) !important;
+}
+
+/* =============================================================================
+   BOTÕES
+   ============================================================================= */
+
+button,
+[role="button"],
+[class*="button"],
+[class*="Button"],
+[class*="btn"],
+input[type="submit"] {
+  background-color: var(--color-ink) !important;
+  color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.75rem 1.5rem !important;
+  cursor: pointer !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+button:hover,
+[role="button"]:hover,
+[class*="button"]:hover,
+[class*="Button"]:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0px 0px var(--color-graphite) !important;
+}
+
+button:active,
+[role="button"]:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0px 0px var(--color-graphite) !important;
+}
+
+/* Primary button */
+[class*="primary"],
+[class*="Primary"],
+button[class*="brand"] {
+  background-color: var(--color-accent-orange) !important;
+  box-shadow: var(--shadow-hard-orange) !important;
+}
+
+/* Secondary button */
+[class*="secondary"],
+[class*="Secondary"] {
+  background-color: var(--color-white) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Ghost/Subtle button */
+[class*="ghost"],
+[class*="Ghost"],
+[class*="subtle"],
+[class*="Subtle"] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+[class*="ghost"]:hover,
+[class*="subtle"]:hover {
+  background-color: var(--color-paper) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* =============================================================================
+   INPUTS E FORMS
+   ============================================================================= */
+
+input,
+textarea,
+select,
+[class*="input"],
+[class*="Input"],
+[class*="textarea"],
+[class*="select"] {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  font-family: var(--font-body) !important;
+  padding: 0.75rem 1rem !important;
+  color: var(--color-ink) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  border-color: var(--color-accent-blue) !important;
+}
+
+label,
+[class*="label"],
+[class*="Label"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: var(--color-steel) !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* =============================================================================
+   BOOKING FORM
+   ============================================================================= */
+
+/* Form container */
+[class*="booking-form"],
+[class*="BookingForm"],
+form[class*="booking"] {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+  padding: 2rem !important;
+}
+
+/* Form sections */
+[class*="booking-form"] > div,
+[class*="form-section"] {
+  padding: 1rem 0 !important;
+  border-bottom: 1px solid var(--color-paper) !important;
+}
+
+/* =============================================================================
+   EVENT TYPE CARDS
+   ============================================================================= */
+
+[class*="event-type"],
+[class*="EventType"],
+[class*="eventtype"],
+.event-type-card {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+  padding: 1.5rem !important;
+  margin: 0.5rem 0 !important;
+  transition: all 0.1s ease !important;
+}
+
+[class*="event-type"]:hover,
+[class*="EventType"]:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0px 0px var(--color-graphite) !important;
+}
+
+/* Event type duration badge */
+[class*="event-type"] [class*="duration"],
+[class*="EventType"] [class*="Duration"],
+.event-duration {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  padding: 0.25rem 0.5rem !important;
+  border: 1px solid var(--color-graphite) !important;
+  background-color: var(--color-paper) !important;
+}
+
+/* =============================================================================
+   AVATAR / PROFILE
+   ============================================================================= */
+
+[class*="avatar"],
+[class*="Avatar"],
+img[class*="avatar"],
+img[class*="profile"] {
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: 2px 2px 0px 0px var(--color-graphite) !important;
+}
+
+/* =============================================================================
+   SUCCESS / CONFIRMATION
+   ============================================================================= */
+
+[class*="success"],
+[class*="Success"],
+[class*="confirmation"],
+[class*="Confirmation"] {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+  padding: 2rem !important;
+  text-align: center !important;
+}
+
+/* Success icon */
+[class*="success"] svg,
+[class*="Success"] svg,
+[class*="check-icon"] {
+  color: #10B981 !important;
+}
+
+/* =============================================================================
+   AVAILABILITY VIEW
+   ============================================================================= */
+
+[class*="availability"],
+[class*="Availability"],
+.availability-grid {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+}
+
+/* Available block */
+[class*="available-block"],
+.available {
+  background-color: var(--color-accent-blue) !important;
+  opacity: 0.3 !important;
+}
+
+/* Busy block */
+[class*="busy-block"],
+.busy {
+  background-color: var(--color-accent-orange) !important;
+  opacity: 0.3 !important;
+}
+
+/* =============================================================================
+   BADGES
+   ============================================================================= */
+
+[class*="badge"],
+[class*="Badge"],
+[class*="tag"],
+[class*="Tag"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  padding: 0.25rem 0.5rem !important;
+  border: 1px solid var(--color-graphite) !important;
+  background-color: var(--color-paper) !important;
+  color: var(--color-ink) !important;
+}
+
+/* =============================================================================
+   MODALS
+   ============================================================================= */
+
+[class*="modal"],
+[class*="Modal"],
+[class*="dialog"],
+[class*="Dialog"],
+[role="dialog"] {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: 8px 8px 0px 0px var(--color-graphite) !important;
+}
+
+[class*="overlay"],
+[class*="Overlay"],
+[class*="backdrop"] {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* =============================================================================
+   NAVIGATION ARROWS
+   ============================================================================= */
+
+[class*="nav-arrow"],
+[class*="NavArrow"],
+[class*="chevron"],
+button[class*="prev"],
+button[class*="next"] {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  color: var(--color-ink) !important;
+  padding: 0.5rem !important;
+}
+
+[class*="nav-arrow"]:hover,
+button[class*="prev"]:hover,
+button[class*="next"]:hover {
+  background-color: var(--color-paper) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+}
+
+/* =============================================================================
+   SCROLLBAR
+   ============================================================================= */
+
+::-webkit-scrollbar {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-paper) !important;
+  border-left: 1px solid var(--color-graphite) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-graphite) !important;
+  border: 2px solid var(--color-paper) !important;
+}
+
+/* =============================================================================
+   DARK MODE OVERRIDE
+   ============================================================================= */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #F2F0E9 !important;
+    --color-ink: #111111 !important;
+  }
+
+  body {
+    background-color: var(--color-paper) !important;
+    color: var(--color-ink) !important;
+  }
+}
+
+/* =============================================================================
+   RESPONSIVIDADE
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  [class*="calendar"],
+  [class*="Calendar"] {
+    box-shadow: var(--shadow-hard-sm) !important;
+  }
+
+  button,
+  [role="button"] {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  [class*="time-slot"] {
+    padding: 0.5rem 0.75rem !important;
+  }
+}

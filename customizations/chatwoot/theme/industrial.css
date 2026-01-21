@@ -1,0 +1,742 @@
+/**
+ * MedFlow Industrial Theme - Chatwoot Override
+ *
+ * Este arquivo sobrescreve os estilos padrão do Chatwoot
+ * para aplicar o Design System Industrial.
+ *
+ * Aplicação: Via Chatwoot custom CSS branding settings
+ */
+
+/* =============================================================================
+   CSS CUSTOM PROPERTIES (TOKENS)
+   ============================================================================= */
+
+:root {
+  /* Cores Industriais */
+  --color-paper: #F2F0E9;
+  --color-ink: #111111;
+  --color-graphite: #000000;
+  --color-accent-orange: #F24E1E;
+  --color-accent-blue: #0047AB;
+  --color-steel: #666666;
+  --color-white: #FFFFFF;
+
+  /* Mapeamento para variáveis do Chatwoot */
+  --w-500: var(--color-accent-orange);
+  --w-600: #DC2626;
+  --w-700: #B91C1C;
+  --w-800: #991B1B;
+  --w-900: #7F1D1D;
+  --w-50: rgba(242, 78, 30, 0.1);
+  --w-75: rgba(242, 78, 30, 0.2);
+  --w-100: rgba(242, 78, 30, 0.3);
+
+  --color-woot: var(--color-accent-orange);
+  --color-primary: var(--color-accent-orange);
+  --color-secondary: var(--color-accent-blue);
+
+  --b-500: var(--color-graphite);
+  --s-500: var(--color-steel);
+  --s-600: var(--color-ink);
+  --s-700: var(--color-ink);
+
+  /* Tipografia */
+  --font-display: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Sombras Industrial */
+  --shadow-hard: 4px 4px 0px 0px var(--color-graphite);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--color-graphite);
+  --shadow-hard-orange: 4px 4px 0px 0px var(--color-accent-orange);
+
+  /* CRÍTICO: Sem border-radius */
+  --border-radius: 0px;
+  --border-radius-normal: 0px;
+  --border-radius-small: 0px;
+  --border-radius-large: 0px;
+  --border-radius-larger: 0px;
+  --border-radius-rounded: 0px;
+  --space-border-radius: 0px;
+}
+
+/* =============================================================================
+   RESET: REMOVER BORDER-RADIUS GLOBAL
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+/* =============================================================================
+   LAYOUT BASE
+   ============================================================================= */
+
+body,
+html,
+#app {
+  background-color: var(--color-paper) !important;
+  font-family: var(--font-body) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Sidebar principal */
+.sidebar,
+.primary-sidebar,
+[class*="sidebar"],
+.woot-sidebar,
+aside {
+  background-color: var(--color-white) !important;
+  border-right: 2px solid var(--color-graphite) !important;
+}
+
+/* Secondary sidebar (conversas) */
+.secondary-sidebar,
+.conversations-sidebar,
+[class*="conversation-list"] {
+  background-color: var(--color-white) !important;
+  border-right: 2px solid var(--color-graphite) !important;
+}
+
+/* Main chat area */
+main,
+.conversation-panel,
+[class*="conversation-panel"],
+.chat-container {
+  background-color: var(--color-paper) !important;
+}
+
+/* =============================================================================
+   TIPOGRAFIA
+   ============================================================================= */
+
+/* Headlines */
+h1, h2, h3, h4, h5, h6,
+.title,
+[class*="title"],
+[class*="heading"],
+.page-title {
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  text-transform: uppercase !important;
+  color: var(--color-ink) !important;
+}
+
+/* Dados e timestamps - Mono */
+time,
+.time,
+.timestamp,
+.date,
+[class*="time"],
+[class*="timestamp"],
+[class*="date"],
+.message-time,
+.conversation-time,
+code,
+pre {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  color: var(--color-steel) !important;
+}
+
+/* =============================================================================
+   LISTA DE CONVERSAS
+   ============================================================================= */
+
+/* Conversation item */
+.conversation,
+.conversation-item,
+[class*="conversation-item"],
+.chat-list-item {
+  background-color: var(--color-white) !important;
+  border-bottom: 1px solid var(--color-graphite) !important;
+  padding: 1rem !important;
+  transition: all 0.1s ease !important;
+}
+
+.conversation:hover,
+.conversation-item:hover,
+[class*="conversation-item"]:hover {
+  background-color: var(--color-paper) !important;
+}
+
+/* Active conversation */
+.conversation.active,
+.conversation-item.active,
+[class*="conversation-item"].active,
+[class*="conversation-item"][class*="selected"],
+.active-conversation {
+  background-color: var(--color-paper) !important;
+  border-left: 4px solid var(--color-accent-orange) !important;
+}
+
+/* Unread indicator */
+.unread-count,
+[class*="unread"],
+.badge-count {
+  background-color: var(--color-accent-orange) !important;
+  color: var(--color-white) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  padding: 0.125rem 0.375rem !important;
+  border: 1px solid var(--color-graphite) !important;
+}
+
+/* =============================================================================
+   MENSAGENS
+   ============================================================================= */
+
+/* Chat messages container */
+.messages-container,
+.conversation-messages,
+[class*="messages-wrap"],
+.chat-body {
+  background-color: var(--color-paper) !important;
+}
+
+/* Message bubble - incoming */
+.message,
+.message-bubble,
+[class*="message-bubble"],
+.message-text-wrap {
+  font-family: var(--font-body) !important;
+  padding: 0.75rem 1rem !important;
+  max-width: 70% !important;
+}
+
+.message.incoming,
+.message-bubble.incoming,
+[class*="incoming"],
+.left-aligned {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Message bubble - outgoing */
+.message.outgoing,
+.message-bubble.outgoing,
+[class*="outgoing"],
+.right-aligned {
+  background-color: var(--color-ink) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  color: var(--color-white) !important;
+}
+
+/* Agent message */
+.message.agent,
+[class*="agent-message"],
+.agent-bubble {
+  background-color: var(--color-accent-blue) !important;
+  color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+}
+
+/* Private note */
+.message.private,
+.private-note,
+[class*="private"],
+[class*="internal-note"] {
+  background-color: #FEF3C7 !important;
+  border: 2px dashed var(--color-accent-orange) !important;
+  color: var(--color-ink) !important;
+}
+
+/* =============================================================================
+   MESSAGE INPUT
+   ============================================================================= */
+
+/* Input area container */
+.message-input,
+.reply-box,
+[class*="reply-box"],
+.chat-footer {
+  background-color: var(--color-white) !important;
+  border-top: 2px solid var(--color-graphite) !important;
+  padding: 1rem !important;
+}
+
+/* Text input */
+.message-input textarea,
+.reply-box textarea,
+[class*="message-input"] textarea,
+textarea.input-textarea {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  font-family: var(--font-body) !important;
+  padding: 0.75rem 1rem !important;
+  resize: none !important;
+}
+
+.message-input textarea:focus,
+.reply-box textarea:focus {
+  outline: none !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  border-color: var(--color-accent-blue) !important;
+}
+
+/* Send button */
+.send-button,
+[class*="send-button"],
+button[class*="send"] {
+  background-color: var(--color-accent-orange) !important;
+  color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.send-button:hover,
+[class*="send-button"]:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 4px 4px 0px 0px var(--color-accent-orange) !important;
+}
+
+/* =============================================================================
+   BOTÕES
+   ============================================================================= */
+
+button,
+[role="button"],
+.button,
+[class*="button"],
+[class*="btn"],
+.woot-button {
+  background-color: var(--color-ink) !important;
+  color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.75rem 1.5rem !important;
+  cursor: pointer !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+button:hover,
+[role="button"]:hover,
+.button:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0px 0px var(--color-graphite) !important;
+}
+
+button:active,
+[role="button"]:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0px 0px var(--color-graphite) !important;
+}
+
+/* Primary button */
+.button--primary,
+[class*="primary"],
+[class*="success"] {
+  background-color: var(--color-accent-orange) !important;
+  box-shadow: var(--shadow-hard-orange) !important;
+}
+
+/* Secondary button */
+.button--secondary,
+[class*="secondary"],
+[class*="clear"] {
+  background-color: var(--color-white) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Ghost/Link button */
+.button--ghost,
+.button--link,
+[class*="ghost"],
+[class*="link"] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Small button */
+.button--small,
+.button--sm,
+.btn-sm {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.75rem !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+}
+
+/* =============================================================================
+   INPUTS E FORMS
+   ============================================================================= */
+
+input,
+textarea,
+select,
+.input,
+[class*="input"],
+.form-input {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  font-family: var(--font-body) !important;
+  padding: 0.75rem 1rem !important;
+  color: var(--color-ink) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+  border-color: var(--color-accent-blue) !important;
+}
+
+label,
+.label,
+[class*="label"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: var(--color-steel) !important;
+}
+
+/* =============================================================================
+   STATUS BADGES
+   ============================================================================= */
+
+/* Status indicators */
+.status,
+.status-badge,
+[class*="status"],
+.conversation-status {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  padding: 0.25rem 0.5rem !important;
+  border: 1px solid var(--color-graphite) !important;
+}
+
+/* Open status */
+.status-open,
+[class*="open"],
+.open {
+  background-color: #10B981 !important;
+  color: var(--color-white) !important;
+}
+
+/* Pending status */
+.status-pending,
+[class*="pending"],
+.pending {
+  background-color: var(--color-accent-orange) !important;
+  color: var(--color-white) !important;
+}
+
+/* Resolved status */
+.status-resolved,
+[class*="resolved"],
+.resolved {
+  background-color: var(--color-accent-blue) !important;
+  color: var(--color-white) !important;
+}
+
+/* Snoozed status */
+.status-snoozed,
+[class*="snoozed"],
+.snoozed {
+  background-color: var(--color-steel) !important;
+  color: var(--color-white) !important;
+}
+
+/* =============================================================================
+   CONTACT PANEL (SIDEBAR DIREITA)
+   ============================================================================= */
+
+.contact-panel,
+.conversation-sidebar,
+[class*="contact-panel"],
+.right-panel {
+  background-color: var(--color-white) !important;
+  border-left: 2px solid var(--color-graphite) !important;
+}
+
+/* Contact info section */
+.contact-info,
+[class*="contact-info"],
+.customer-profile {
+  padding: 1.5rem !important;
+  border-bottom: 2px solid var(--color-graphite) !important;
+}
+
+/* Attribute labels */
+.contact-attribute-label,
+[class*="attribute-label"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  color: var(--color-steel) !important;
+}
+
+/* =============================================================================
+   TABS
+   ============================================================================= */
+
+.tabs,
+[class*="tabs"],
+.tab-list {
+  border-bottom: 2px solid var(--color-graphite) !important;
+  background-color: var(--color-white) !important;
+}
+
+.tab,
+.tab-item,
+[class*="tab-item"],
+[role="tab"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  padding: 1rem 1.5rem !important;
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.tab.active,
+.tab-item.active,
+[aria-selected="true"],
+[class*="active-tab"] {
+  background-color: var(--color-ink) !important;
+  color: var(--color-white) !important;
+}
+
+/* =============================================================================
+   DROPDOWNS
+   ============================================================================= */
+
+.dropdown,
+[class*="dropdown"],
+.dropdown-menu,
+[class*="dropdown-menu"],
+[role="menu"] {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+}
+
+.dropdown-item,
+[class*="dropdown-item"],
+[role="menuitem"] {
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid var(--color-paper) !important;
+}
+
+.dropdown-item:hover,
+[role="menuitem"]:hover {
+  background-color: var(--color-paper) !important;
+}
+
+/* =============================================================================
+   MODALS
+   ============================================================================= */
+
+.modal,
+[class*="modal"],
+.dialog,
+[role="dialog"] {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: 8px 8px 0px 0px var(--color-graphite) !important;
+}
+
+.modal-header,
+[class*="modal-header"] {
+  background-color: var(--color-ink) !important;
+  color: var(--color-white) !important;
+  padding: 1rem 1.5rem !important;
+  font-family: var(--font-display) !important;
+  text-transform: uppercase !important;
+}
+
+.modal-overlay,
+[class*="overlay"],
+.backdrop {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* =============================================================================
+   AVATARS
+   ============================================================================= */
+
+.avatar,
+[class*="avatar"],
+.user-thumbnail,
+.thumbnail {
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: 2px 2px 0px 0px var(--color-graphite) !important;
+}
+
+/* Online indicator */
+.online-indicator,
+[class*="online"],
+.presence-indicator {
+  background-color: #10B981 !important;
+  border: 2px solid var(--color-white) !important;
+}
+
+/* =============================================================================
+   EMOJI PICKER
+   ============================================================================= */
+
+.emoji-picker,
+[class*="emoji-picker"],
+.emoji-dialog {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+}
+
+/* =============================================================================
+   NOTIFICATIONS / ALERTS
+   ============================================================================= */
+
+.notification,
+.alert,
+[class*="notification"],
+[class*="alert"],
+.toast {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+  font-family: var(--font-body) !important;
+}
+
+.notification--success,
+.alert--success {
+  border-left: 4px solid #10B981 !important;
+}
+
+.notification--error,
+.alert--error {
+  border-left: 4px solid var(--color-accent-orange) !important;
+}
+
+.notification--warning,
+.alert--warning {
+  border-left: 4px solid #F59E0B !important;
+}
+
+.notification--info,
+.alert--info {
+  border-left: 4px solid var(--color-accent-blue) !important;
+}
+
+/* =============================================================================
+   SEARCH
+   ============================================================================= */
+
+.search-box,
+[class*="search"],
+.search-input {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+}
+
+.search-box input,
+[class*="search"] input {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* =============================================================================
+   CANNED RESPONSES
+   ============================================================================= */
+
+.canned-response,
+[class*="canned-response"],
+.quick-reply {
+  background-color: var(--color-white) !important;
+  border: 2px solid var(--color-graphite) !important;
+  padding: 0.75rem 1rem !important;
+  font-family: var(--font-body) !important;
+  cursor: pointer !important;
+}
+
+.canned-response:hover {
+  background-color: var(--color-paper) !important;
+  box-shadow: var(--shadow-hard-sm) !important;
+}
+
+/* =============================================================================
+   SCROLLBAR
+   ============================================================================= */
+
+::-webkit-scrollbar {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-paper) !important;
+  border-left: 1px solid var(--color-graphite) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-graphite) !important;
+  border: 2px solid var(--color-paper) !important;
+}
+
+/* =============================================================================
+   WIDGET (EMBED)
+   ============================================================================= */
+
+.woot-widget-bubble,
+[class*="widget-bubble"],
+.chat-bubble {
+  background-color: var(--color-accent-orange) !important;
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+}
+
+.woot-widget-holder,
+[class*="widget-holder"] {
+  border: 2px solid var(--color-graphite) !important;
+  box-shadow: var(--shadow-hard) !important;
+}
+
+/* =============================================================================
+   DARK MODE OVERRIDE
+   ============================================================================= */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #F2F0E9 !important;
+    --color-ink: #111111 !important;
+  }
+
+  body, html, #app {
+    background-color: var(--color-paper) !important;
+    color: var(--color-ink) !important;
+  }
+}
+
+/* =============================================================================
+   RESPONSIVIDADE
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  button,
+  [role="button"] {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.75rem !important;
+    box-shadow: var(--shadow-hard-sm) !important;
+  }
+
+  .message-bubble,
+  [class*="message-bubble"] {
+    max-width: 85% !important;
+  }
+}
