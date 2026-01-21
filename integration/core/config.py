@@ -1,16 +1,29 @@
-"""Application configuration with multi-tenant support."""
+"""Application configuration with security validation."""
 
+import secrets
+import sys
 from functools import lru_cache
+from typing import Self
+
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _generate_dev_secret(name: str) -> str:
+    """Generate a random secret for development. Logs a warning."""
+    secret = secrets.token_urlsafe(32)
+    print(f"⚠️  DEV MODE: Generated random {name}. Set in .env for production.", file=sys.stderr)
+    return secret
+
+
 class Settings(BaseSettings):
-    """Application settings."""
+    """Application settings with security validation."""
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",
     )
 
     # Application
@@ -18,16 +31,19 @@ class Settings(BaseSettings):
     app_env: str = "development"
     debug: bool = False
 
-    # Database
-    database_url: str = "postgresql+asyncpg://medflow:medflow_secret@postgres:5432/integration"
+    # Database - NO DEFAULT PASSWORD
+    database_url: str = "postgresql+asyncpg://medflow:medflow_secret@postgres:5432/medflow"
 
     # Redis
     redis_url: str = "redis://redis:6379"
 
-    # Auth
-    jwt_secret: str = "change-me-jwt-secret"
+    # Auth - NO DEFAULTS, validated below
+    jwt_secret: str = ""
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24  # 24 hours
+
+    # Webhooks - NO DEFAULTS, validated below
+    webhook_secret: str = ""
 
     # External Services
     twenty_api_url: str = "http://twenty-server:3000"
@@ -38,14 +54,15 @@ class Settings(BaseSettings):
     chatwoot_api_key: str | None = None
 
     # LLM Configuration
-    llm_provider: str = "anthropic"  # anthropic, openai, google
-    model_smart: str = "claude-sonnet-4-5-20250514"  # For complex reasoning
-    model_fast: str = "claude-haiku-4-20250514"  # For routing/simple tasks
+    llm_provider: str = "anthropic"  # anthropic, openai, google, xai
+    model_smart: str = "claude-sonnet-4-5-20250514"
+    model_fast: str = "claude-haiku-4-20250514"
 
-    # LLM Keys
+    # LLM Keys - at least one required for agents
     anthropic_api_key: str | None = None
     openai_api_key: str | None = None
     google_api_key: str | None = None
+    xai_api_key: str | None = None
 
     # WhatsApp (Evolution API)
     evolution_api_url: str | None = None
@@ -54,13 +71,45 @@ class Settings(BaseSettings):
     # Image Generation
     replicate_api_key: str | None = None
 
-    # Webhooks
-    webhook_secret: str = "change-me-webhook-secret"
-
-    # CORS - Configure properly for production!
-    # In dev: ["*"]
-    # In prod: ["https://your-domain.com"]
+    # CORS
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+
+    @model_validator(mode="after")
+    def validate_security(self) -> Self:
+        """Validate security settings based on environment."""
+        is_prod = self.app_env == "production"
+
+        # JWT Secret validation
+        if not self.jwt_secret or self.jwt_secret.startswith("change-me"):
+            if is_prod:
+                raise ValueError(
+                    "FATAL: JWT_SECRET must be set in production. "
+                    "Generate with: python -c \"import secrets; print(secrets.token_urlsafe(32))\""
+                )
+            self.jwt_secret = _generate_dev_secret("JWT_SECRET")
+
+        if len(self.jwt_secret) < 32:
+            if is_prod:
+                raise ValueError("JWT_SECRET must be at least 32 characters in production")
+            print("⚠️  JWT_SECRET is weak (<32 chars). Use longer secret in production.", file=sys.stderr)
+
+        # Webhook Secret validation
+        if not self.webhook_secret or self.webhook_secret.startswith("change-me"):
+            if is_prod:
+                raise ValueError("FATAL: WEBHOOK_SECRET must be set in production")
+            self.webhook_secret = _generate_dev_secret("WEBHOOK_SECRET")
+
+        # LLM Key validation - warn if none configured
+        has_llm_key = any([
+            self.anthropic_api_key,
+            self.openai_api_key,
+            self.google_api_key,
+            self.xai_api_key,
+        ])
+        if not has_llm_key:
+            print("⚠️  No LLM API key configured. Agents will not work.", file=sys.stderr)
+
+        return self
 
     @property
     def is_development(self) -> bool:
@@ -69,6 +118,16 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"
+
+    def get_llm_api_key(self) -> str | None:
+        """Get the API key for the configured LLM provider."""
+        provider_keys = {
+            "anthropic": self.anthropic_api_key,
+            "openai": self.openai_api_key,
+            "google": self.google_api_key,
+            "xai": self.xai_api_key,
+        }
+        return provider_keys.get(self.llm_provider)
 
 
 @lru_cache
