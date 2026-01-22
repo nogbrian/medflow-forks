@@ -183,6 +183,16 @@ async def health_check():
     return {"status": "healthy", "env": settings.app_env, "build": "20260122-v3", "version": "3.0.0"}
 
 
+@app.get("/debug-version")
+async def debug_version():
+    """Debug endpoint to verify code deployment."""
+    return {
+        "commit": "9d359f4-plus",
+        "deployed_at": "2026-01-22T06:30:00Z",
+        "message": "If you see this, the new code is running"
+    }
+
+
 @app.get("/")
 async def root():
     """Root endpoint - service info."""
