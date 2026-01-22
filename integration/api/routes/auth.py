@@ -1,7 +1,6 @@
 """Authentication routes."""
 
 from datetime import datetime, timezone
-from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, Header, status
 from pydantic import BaseModel, EmailStr
@@ -15,7 +14,7 @@ from core.auth import (
     verify_password,
 )
 from core.config import get_settings
-from core.models import Agency, AgencyPlan, Clinic, ClinicStatus, User, UserRole
+from core.models import User
 
 router = APIRouter(prefix="/auth")
 settings = get_settings()
@@ -140,6 +139,10 @@ async def seed_database(
     - Superusers (CTO, Heloisa, Brian)
     - Demo clinic
     """
+    # Lazy imports to avoid circular dependencies
+    from uuid import uuid4
+    from core.models import Agency, AgencyPlan, Clinic, ClinicStatus, UserRole
+
     # Verify seed token matches webhook secret
     if x_seed_token != settings.webhook_secret:
         raise HTTPException(
