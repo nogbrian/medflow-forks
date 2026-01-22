@@ -1,5 +1,6 @@
 """
 MedFlow Integration Layer - Simplified Main Application for debugging.
+Build: 2026-01-22T07:00:00Z - forced rebuild
 """
 
 import logging
