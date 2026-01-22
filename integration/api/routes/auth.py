@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, HTTPException, Header, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 
@@ -13,11 +13,9 @@ from core.auth import (
     get_password_hash,
     verify_password,
 )
-from core.config import get_settings
 from core.models import User
 
 router = APIRouter(prefix="/auth")
-settings = get_settings()
 
 
 class LoginRequest(BaseModel):
@@ -124,142 +122,3 @@ async def change_password(
     await db.flush()
 
     return {"message": "Password changed successfully"}
-
-
-@router.post("/seed")
-async def seed_database(
-    db: DBSession,
-    x_seed_token: str = Header(None, alias="X-Seed-Token"),
-):
-    """
-    Seed the database with initial data (protected by seed token).
-
-    This endpoint creates:
-    - Tráfego para Consultórios agency
-    - Superusers (CTO, Heloisa, Brian)
-    - Demo clinic
-    """
-    # Lazy imports to avoid circular dependencies
-    from uuid import uuid4
-    from core.models import Agency, AgencyPlan, Clinic, ClinicStatus, UserRole
-
-    # Verify seed token matches webhook secret
-    if x_seed_token != settings.webhook_secret:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid seed token",
-        )
-
-    # Check if already seeded
-    result = await db.execute(select(Agency).limit(1))
-    if result.scalar_one_or_none():
-        return {"message": "Database already seeded", "status": "skipped"}
-
-    # Create agency
-    agency = Agency(
-        id=str(uuid4()),
-        name="Tráfego para Consultórios",
-        slug="tpc",
-        email="contato@trafegoparaconsultorios.com.br",
-        phone="+55 11 99999-0000",
-        plan=AgencyPlan.ENTERPRISE,
-        max_clinics=100,
-        branding={
-            "logo_url": None,
-            "primary_color": "#F24E1E",
-            "secondary_color": "#111111",
-            "company_name": "Tráfego para Consultórios",
-        },
-        settings={
-            "default_language": "pt-BR",
-            "timezone": "America/Sao_Paulo",
-        },
-    )
-    db.add(agency)
-    await db.flush()
-
-    # Create superusers
-    users_created = []
-
-    # CTO
-    cto = User(
-        id=str(uuid4()),
-        agency_id=agency.id,
-        email="cto@trafegoparaconsultorios.com.br",
-        password_hash=get_password_hash("tpc2026#"),
-        role=UserRole.SUPERUSER,
-        name="CTO",
-        is_active=True,
-        email_verified=True,
-    )
-    db.add(cto)
-    users_created.append(cto.email)
-
-    # Heloisa
-    heloisa = User(
-        id=str(uuid4()),
-        agency_id=agency.id,
-        email="heloisa@trafegoparaconsultorios.com.br",
-        password_hash=get_password_hash("tpc2026#"),
-        role=UserRole.SUPERUSER,
-        name="Heloísa",
-        is_active=True,
-        email_verified=True,
-    )
-    db.add(heloisa)
-    users_created.append(heloisa.email)
-
-    # Brian
-    brian = User(
-        id=str(uuid4()),
-        agency_id=agency.id,
-        email="briansouzanogueira@gmail.com",
-        password_hash=get_password_hash("tpc2026#"),
-        role=UserRole.SUPERUSER,
-        name="Brian Souza Nogueira",
-        is_active=True,
-        email_verified=True,
-    )
-    db.add(brian)
-    users_created.append(brian.email)
-
-    # Create demo clinic
-    clinic = Clinic(
-        id=str(uuid4()),
-        agency_id=agency.id,
-        name="Clínica Demo",
-        slug="demo",
-        specialty="Dermatologia",
-        email="contato@clinicademo.com",
-        phone="+55 11 98888-0000",
-        whatsapp="+55 11 98888-0001",
-        city="São Paulo",
-        state="SP",
-        status=ClinicStatus.ACTIVE,
-        ai_persona={
-            "name": "Assistente Demo",
-            "tone": "professional_friendly",
-            "specialties": ["dermatologia", "estética"],
-        },
-        settings={
-            "working_hours": {
-                "monday": {"start": "08:00", "end": "18:00"},
-                "tuesday": {"start": "08:00", "end": "18:00"},
-                "wednesday": {"start": "08:00", "end": "18:00"},
-                "thursday": {"start": "08:00", "end": "18:00"},
-                "friday": {"start": "08:00", "end": "18:00"},
-            },
-            "appointment_duration": 30,
-        },
-    )
-    db.add(clinic)
-
-    await db.commit()
-
-    return {
-        "message": "Database seeded successfully",
-        "status": "completed",
-        "agency": agency.name,
-        "users": users_created,
-        "clinic": clinic.name,
-    }

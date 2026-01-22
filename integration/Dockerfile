@@ -1,4 +1,4 @@
-# Build stage - Build v3.0.0
+# Build stage
 FROM python:3.12-slim as builder
 
 WORKDIR /app
