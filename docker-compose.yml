@@ -18,6 +18,7 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       XAI_API_KEY: ${XAI_API_KEY:-}
       REPLICATE_API_KEY: ${REPLICATE_API_KEY:-}
       TWENTY_API_URL: ${TWENTY_API_URL:-}
@@ -50,11 +51,13 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://integration:8000}
+        - NEXT_PUBLIC_CREATIVE_STUDIO_URL=${NEXT_PUBLIC_CREATIVE_STUDIO_URL:-http://creative-studio:3001}
     restart: unless-stopped
     expose:
       - "3000"
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://integration:8000}
+      NEXT_PUBLIC_CREATIVE_STUDIO_URL: ${NEXT_PUBLIC_CREATIVE_STUDIO_URL:-http://creative-studio:3001}
       API_URL: http://integration:8000
       NODE_ENV: production
     healthcheck:
@@ -72,6 +75,28 @@ services:
       resources:
         limits:
           memory: 512M
+
+  creative-studio:
+    build:
+      context: ./creative-studio
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "3001"
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - coolify
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
 networks:
   coolify:

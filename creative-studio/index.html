@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tráfego para Consultórios | Creative Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              eng: {
+                blue: '#0F3038',
+                dark: '#0A2228',
+              },
+              concrete: '#808080',
+              alert: '#FF6400',
+              tech: {
+                white: '#F5F5F2',
+                surface: '#FFFFFF'
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['Roboto Mono', 'monospace'],
+            },
+            boxShadow: {
+              'tech': '0 1px 3px rgba(0,0,0,0.05)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #F5F5F2;
+      }
+      /* Blueprint Grid Pattern */
+      .bg-blueprint {
+        background-color: #F5F5F2;
+        background-image: 
+          linear-gradient(to right, rgba(15, 48, 56, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(15, 48, 56, 0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+      
+      /* Custom scrollbar */
+      .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+      }
+      .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+      }
+      
+      /* Markdown Styles - Updated to use currentColor for contrast adaptation */
+      .markdown-body ul {
+        list-style-type: disc;
+        padding-left: 1.5em;
+        margin-bottom: 1em;
+      }
+      .markdown-body ol {
+        list-style-type: decimal;
+        padding-left: 1.5em;
+        margin-bottom: 1em;
+      }
+      .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+        color: inherit;
+      }
+      .markdown-body p {
+        margin-bottom: 0.8em;
+        line-height: 1.6;
+        color: inherit;
+      }
+      .markdown-body strong {
+        font-weight: 600;
+        color: inherit;
+      }
+      .markdown-body code {
+        font-family: 'Roboto Mono', monospace;
+        background: rgba(0, 0, 0, 0.1);
+        padding: 2px 4px;
+        border-radius: 2px;
+        font-size: 0.9em;
+        color: inherit;
+      }
+      .markdown-body a {
+        text-decoration: underline;
+        color: inherit;
+        opacity: 0.9;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react-markdown": "https://esm.sh/react-markdown@^10.1.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-tech-white text-eng-blue h-screen overflow-hidden">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
