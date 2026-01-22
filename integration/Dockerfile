@@ -35,6 +35,9 @@ ENV PATH=/home/appuser/.local/bin:$PATH
 # Copy application code
 COPY . .
 
+# Make startup script executable
+RUN chmod +x startup.sh
+
 # Fix ownership
 RUN chown -R appuser:appuser /app /home/appuser/.local
 
@@ -47,5 +50,5 @@ HEALTHCHECK --interval=60s --timeout=30s --start-period=120s --retries=5 \
 
 EXPOSE 8000
 
-# Use proper worker configuration for production
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+# Use startup script that seeds the database and starts the app
+CMD ["./startup.sh"]
