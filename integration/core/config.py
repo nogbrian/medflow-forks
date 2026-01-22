@@ -73,31 +73,35 @@ class Settings(BaseSettings):
     # Image Generation
     replicate_api_key: str | None = None
 
-    # CORS
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+    # CORS - stored as string to avoid pydantic-settings JSON parsing issues
+    cors_origins_raw: str = "http://localhost:3000,http://localhost:3001"
 
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v):
+    @property
+    def cors_origins(self) -> list[str]:
         """Parse CORS origins from various formats (handles Coolify escaping issues)."""
-        if isinstance(v, list):
-            return v
-        if isinstance(v, str):
-            # Remove surrounding quotes if present
-            v = v.strip().strip("'\"")
-            # Handle double-escaped JSON from Coolify
-            if v.startswith('[\\') or '\\"' in v:
-                v = v.replace('\\"', '"').replace('\\/', '/')
-            # Try parsing as JSON
+        v = self.cors_origins_raw
+        if not v:
+            return ["http://localhost:3000"]
+
+        # Remove surrounding quotes if present
+        v = v.strip().strip("'\"")
+
+        # Handle double-escaped JSON from Coolify
+        if v.startswith('[\\') or '\\"' in v:
+            v = v.replace('\\"', '"').replace('\\/', '/')
+
+        # Try parsing as JSON array
+        if v.startswith('['):
             try:
                 parsed = json.loads(v)
                 if isinstance(parsed, list):
                     return parsed
                 return [parsed]
             except json.JSONDecodeError:
-                # Fallback: comma-separated
-                return [origin.strip() for origin in v.split(",") if origin.strip()]
-        return v
+                pass
+
+        # Fallback: comma-separated
+        return [origin.strip() for origin in v.split(",") if origin.strip()]
 
     @model_validator(mode="after")
     def validate_security(self) -> Self:
