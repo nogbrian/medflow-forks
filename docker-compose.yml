@@ -59,6 +59,8 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000"]}
     expose:
       - "8000"
+    labels:
+      - "traefik.http.services.integration.loadbalancer.server.port=8000"
     volumes:
       - agent_storage:/tmp/agno
     healthcheck:
