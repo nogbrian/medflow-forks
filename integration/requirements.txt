@@ -45,3 +45,6 @@ sentry-sdk[fastapi]>=1.39.0
 python-dotenv>=1.0.0
 ulid-py>=1.1.0
 tenacity>=8.2.0
+
+# External Services
+apify-client>=1.6.0
