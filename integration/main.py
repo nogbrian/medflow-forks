@@ -180,7 +180,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "service": "integration"}
+    return {"status": "healthy", "env": settings.app_env, "version": "2.0.0"}
 
 
 @app.get("/")
