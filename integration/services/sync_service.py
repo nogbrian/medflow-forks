@@ -39,6 +39,7 @@ def verify_webhook_signature(
     signature: str,
     secret: str,
     algorithm: str = "sha256",
+    timestamp: str | None = None,
 ) -> bool:
     """
     Verify webhook signature using HMAC.
@@ -46,6 +47,7 @@ def verify_webhook_signature(
     Supports common formats:
     - sha256=<hex>
     - <hex>
+    - Twenty CRM format: timestamp:payload
     """
     if not secret or not signature:
         return False
@@ -58,22 +60,30 @@ def verify_webhook_signature(
             algorithm = parts[0]
             signature = parts[1]
 
+    # Build the string to sign
+    # Twenty CRM uses timestamp:payload format
+    if timestamp:
+        string_to_sign = f"{timestamp}:".encode() + payload
+    else:
+        string_to_sign = payload
+
     # Compute expected signature
     if algorithm == "sha256":
         expected = hmac.new(
             secret.encode(),
-            payload,
+            string_to_sign,
             hashlib.sha256,
         ).hexdigest()
     elif algorithm == "sha1":
         expected = hmac.new(
             secret.encode(),
-            payload,
+            string_to_sign,
             hashlib.sha1,
         ).hexdigest()
     else:
         return False
 
+    logger.info(f"Signature verification: expected={expected[:16]}..., received={signature[:16]}...")
     return hmac.compare_digest(expected, signature)
 
 

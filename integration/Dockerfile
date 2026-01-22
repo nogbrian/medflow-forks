@@ -32,9 +32,9 @@ RUN useradd --create-home --shell /bin/bash appuser
 COPY --from=builder /root/.local /home/appuser/.local
 ENV PATH=/home/appuser/.local/bin:$PATH
 
-# Cache buster for forced rebuilds
-ARG BUILD_VERSION=1
-ENV BUILD_VERSION=${BUILD_VERSION}
+# Cache buster for forced rebuilds - TIMESTAMP INVALIDATES CACHE
+ARG CACHE_BUST=1
+RUN echo "Cache bust: ${CACHE_BUST}"
 
 # Copy application code
 COPY . .

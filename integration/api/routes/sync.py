@@ -102,6 +102,7 @@ async def handle_twenty_webhook(
     db: DBSession,
     x_twenty_signature: str | None = Header(None, alias="X-Twenty-Signature"),
     x_twenty_webhook_signature: str | None = Header(None, alias="X-Twenty-Webhook-Signature"),
+    x_twenty_webhook_timestamp: str | None = Header(None, alias="X-Twenty-Webhook-Timestamp"),
 ):
     """
     Handle webhooks from Twenty CRM.
@@ -120,12 +121,13 @@ async def handle_twenty_webhook(
     signature = x_twenty_webhook_signature or x_twenty_signature
 
     # Verify signature
+    # Twenty uses format: HMAC-SHA256(timestamp:payload, secret)
     if settings.webhook_secret and settings.webhook_secret != "change-me-webhook-secret":
         if not signature:
             logger.warning("Twenty webhook missing signature (checked X-Twenty-Signature and X-Twenty-Webhook-Signature)")
             raise HTTPException(status_code=401, detail="Missing signature")
 
-        if not verify_webhook_signature(body, signature, settings.webhook_secret):
+        if not verify_webhook_signature(body, signature, settings.webhook_secret, timestamp=x_twenty_webhook_timestamp):
             logger.warning("Twenty webhook signature verification failed")
             raise HTTPException(status_code=401, detail="Invalid signature")
 
