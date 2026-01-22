@@ -47,12 +47,12 @@ class Settings(BaseSettings):
     # Webhooks - NO DEFAULTS, validated below
     webhook_secret: str = ""
 
-    # External Services
-    twenty_api_url: str = "http://twenty-server:3000"
+    # External Services - use sslip.io URLs as defaults for Coolify deployment
+    twenty_api_url: str = "http://twenty-m8w8gso08k44wc0cs4oswosg.72.61.37.176.sslip.io"
     twenty_api_key: str | None = None
-    calcom_api_url: str = "http://calcom:3000"
+    calcom_api_url: str = "http://calcom-bk0k00wkoog8ck48c4k8k4gc.72.61.37.176.sslip.io"
     calcom_api_key: str | None = None
-    chatwoot_api_url: str = "http://chatwoot-rails:3000"
+    chatwoot_api_url: str = "http://chatwoot-d8gc84okgccw84g444wgswko.72.61.37.176.sslip.io"
     chatwoot_api_key: str | None = None
 
     # LLM Configuration
