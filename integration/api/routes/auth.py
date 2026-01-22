@@ -1,5 +1,6 @@
 """Authentication routes."""
 
+import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, status
@@ -15,6 +16,7 @@ from core.auth import (
 )
 from core.models import User
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth")
 
 
@@ -47,15 +49,37 @@ class UserResponse(BaseModel):
 @router.post("/login", response_model=LoginResponse)
 async def login(data: LoginRequest, db: DBSession):
     """Login and get access token."""
-    result = await db.execute(
-        select(User).where(User.email == data.email)
-    )
-    user = result.scalar_one_or_none()
+    try:
+        logger.info(f"Login attempt for email: {data.email}")
+        result = await db.execute(
+            select(User).where(User.email == data.email)
+        )
+        user = result.scalar_one_or_none()
+        logger.info(f"User found: {user is not None}")
 
-    if not user or not verify_password(data.password, user.password_hash):
+        if not user:
+            logger.info("User not found in database")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password",
+            )
+
+        logger.info(f"Verifying password for user {user.email}")
+        password_valid = verify_password(data.password, user.password_hash)
+        logger.info(f"Password valid: {password_valid}")
+
+        if not password_valid:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password",
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception(f"Login error: {e}")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Login error: {str(e)}",
         )
 
     if not user.is_active:
