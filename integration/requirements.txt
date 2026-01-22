@@ -49,4 +49,6 @@ tenacity>=8.2.0
 
 # External Services
 apify-client>=1.6.0
-# Build timestamp: 1769101000 (forced rebuild)
+
+# Cache buster - change this to force full rebuild
+typing-extensions>=4.0.0
