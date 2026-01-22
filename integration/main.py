@@ -211,69 +211,17 @@ async def root():
 
 
 # =============================================================================
-# IMPORT ROUTES (lazy to avoid circular imports)
+# IMPORT ROUTES - Minimal version for debugging
 # =============================================================================
 
-logger.info("Starting route imports...")
-
-# Import routes directly to avoid __init__.py issues
-try:
-    from api.routes.auth import router as auth_router
-    logger.info("auth_router imported successfully")
-except Exception as e:
-    logger.error(f"Failed to import auth_router: {e}")
-    raise
-
-try:
-    from api.routes.admin import router as admin_router
-    logger.info("admin_router imported successfully")
-except Exception as e:
-    logger.error(f"Failed to import admin_router: {e}")
-    raise
-
-try:
-    from api.routes.clinics import router as clinics_router
-    logger.info("clinics_router imported successfully")
-except Exception as e:
-    logger.error(f"Failed to import clinics_router: {e}")
-    raise
-
-# Auth & Users
+# Only import auth for now (we know it works)
+from api.routes.auth import router as auth_router
 app.include_router(auth_router, prefix="/api", tags=["Auth"])
 
-# Admin (database management)
-app.include_router(admin_router, prefix="/api", tags=["Admin"])
-
-# Clinics (multi-tenant)
-app.include_router(clinics_router, prefix="/api", tags=["Clinics"])
-
-# Other routes - import on demand to avoid issues
+# Try admin - if it fails, don't crash the app
 try:
-    from api.routes.agents import router as agents_router
-    app.include_router(agents_router, prefix="/api", tags=["Agents"])
+    from api.routes.admin import router as admin_router
+    app.include_router(admin_router, prefix="/api", tags=["Admin"])
+    logger.info("Admin routes loaded successfully")
 except Exception as e:
-    logger.error(f"Failed to import agents router: {e}")
-
-try:
-    from api.routes.creative_lab import router as creative_lab_router
-    app.include_router(creative_lab_router, prefix="/api", tags=["Creative Lab"])
-except Exception as e:
-    logger.error(f"Failed to import creative_lab router: {e}")
-
-try:
-    from api.routes.sync import router as sync_router
-    app.include_router(sync_router, prefix="/api", tags=["Sync"])
-except Exception as e:
-    logger.error(f"Failed to import sync router: {e}")
-
-try:
-    from api.routes.navigation import router as navigation_router
-    app.include_router(navigation_router, prefix="/api", tags=["Navigation"])
-except Exception as e:
-    logger.error(f"Failed to import navigation router: {e}")
-
-try:
-    from api.routes.branding import router as branding_router
-    app.include_router(branding_router, prefix="/api", tags=["Branding"])
-except Exception as e:
-    logger.error(f"Failed to import branding router: {e}")
+    logger.error(f"Failed to load admin routes: {e}")
