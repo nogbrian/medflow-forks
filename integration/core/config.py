@@ -73,6 +73,9 @@ class Settings(BaseSettings):
     # Image Generation
     replicate_api_key: str | None = None
 
+    # Scraping (Apify)
+    apify_token: str | None = None
+
     # CORS - stored as string to avoid pydantic-settings JSON parsing issues
     cors_origins_raw: str = "http://localhost:3000,http://localhost:3001"
 

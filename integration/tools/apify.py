@@ -5,15 +5,15 @@ from typing import Any
 from apify_client import ApifyClient
 
 from core.config import get_settings
-from config.apify_actors import (
-    GOOGLE_TRENDS_SCRAPER,
-    INSTAGRAM_HASHTAG_SCRAPER,
-    INSTAGRAM_PROFILE_SCRAPER,
-    META_ADS_LIBRARY_SCRAPER,
-    YOUTUBE_CHANNEL_SCRAPER,
-    YOUTUBE_SCRAPER,
-)
 from core.logging import get_logger
+
+# Apify Actor IDs
+GOOGLE_TRENDS_SCRAPER = "jupri/google-trends-scraper"
+INSTAGRAM_HASHTAG_SCRAPER = "apify/instagram-hashtag-scraper"
+INSTAGRAM_PROFILE_SCRAPER = "apify/instagram-profile-scraper"
+META_ADS_LIBRARY_SCRAPER = "apify/facebook-ads-library-scraper"
+YOUTUBE_CHANNEL_SCRAPER = "bernardo/youtube-channel-scraper"
+YOUTUBE_SCRAPER = "bernardo/youtube-scraper"
 
 logger = get_logger(__name__)
 settings = get_settings()
