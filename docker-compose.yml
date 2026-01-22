@@ -1,15 +1,12 @@
-# =============================================================================
-# MEDFLOW FORKS - Unified Medical Growth Platform
-# =============================================================================
-# Coolify-optimized Docker Compose configuration
-# =============================================================================
-
+# MEDFLOW FORKS - Coolify Docker Compose
 services:
   integration:
     build:
       context: ./integration
       dockerfile: Dockerfile
     restart: unless-stopped
+    expose:
+      - "8000"
     environment:
       APP_ENV: ${APP_ENV:-production}
       DEBUG: ${DEBUG:-false}
@@ -34,10 +31,16 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000"]}
     volumes:
       - agent_storage:/tmp/agno
+    networks:
+      - coolify
     deploy:
       resources:
         limits:
           memory: 1G
+
+networks:
+  coolify:
+    external: true
 
 volumes:
   agent_storage:
