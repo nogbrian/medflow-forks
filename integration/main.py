@@ -131,7 +131,12 @@ async def seed_database(data: SeedRequest):
             # Create superusers
             # Truncate password to 72 bytes (bcrypt limit)
             safe_password = data.password[:72] if data.password else "tpc2026#"
-            password_hash = pwd_context.hash(safe_password)
+            logger.info(f"Hashing password of length {len(safe_password)} bytes")
+            try:
+                password_hash = pwd_context.hash(safe_password)
+            except Exception as hash_error:
+                logger.exception(f"Hash error for password length {len(safe_password)}: {hash_error}")
+                return {"status": "error", "message": f"Hash error: {str(hash_error)}", "password_len": len(safe_password)}
             users = [
                 ("cto@trafegoparaconsultorios.com.br", "CTO"),
                 ("heloisa@trafegoparaconsultorios.com.br", "Heloísa"),
