@@ -35,16 +35,10 @@ services:
       - "traefik.http.routers.https-0-qgskkcw0o88404g8cwk0880w-integration.service=medflow-api"
     volumes:
       - agent_storage:/tmp/agno
-    networks:
-      - coolify
     deploy:
       resources:
         limits:
           memory: 1G
-
-networks:
-  coolify:
-    external: true
 
 volumes:
   agent_storage:
