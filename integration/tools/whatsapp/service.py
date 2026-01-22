@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from functools import lru_cache
 
-from config import get_settings
+from core.config import get_settings
 
 from .types import Button, ListSection, SendMessageResult
 

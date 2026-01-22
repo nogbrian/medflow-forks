@@ -5,7 +5,7 @@ from pathlib import Path
 from agno.agent import Agent
 from agno.tools import tool
 
-from config import get_settings
+from core.config import get_settings
 from tools import (
     WhatsAppService,
     buscar_lead,

@@ -3,7 +3,7 @@
 from agno.agent import Agent
 from agno.team import Team
 
-from config import get_settings
+from core.config import get_settings
 from tools import buscar_contexto_cliente
 
 from .atendente_agencia import atendente_agencia, create_atendente_agencia

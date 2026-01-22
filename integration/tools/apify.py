@@ -4,7 +4,7 @@ from typing import Any
 
 from apify_client import ApifyClient
 
-from config import get_settings
+from core.config import get_settings
 from config.apify_actors import (
     GOOGLE_TRENDS_SCRAPER,
     INSTAGRAM_HASHTAG_SCRAPER,

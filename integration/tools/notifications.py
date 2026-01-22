@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from config import get_settings
+from core.config import get_settings
 from core.logging import get_logger
 
 from .whatsapp import get_whatsapp_service
