@@ -129,7 +129,9 @@ async def seed_database(data: SeedRequest):
             )
 
             # Create superusers
-            password_hash = pwd_context.hash(data.password)
+            # Truncate password to 72 bytes (bcrypt limit)
+            safe_password = data.password[:72] if data.password else "tpc2026#"
+            password_hash = pwd_context.hash(safe_password)
             users = [
                 ("cto@trafegoparaconsultorios.com.br", "CTO"),
                 ("heloisa@trafegoparaconsultorios.com.br", "Heloísa"),
