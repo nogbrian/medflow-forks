@@ -295,7 +295,8 @@ except Exception as e:
 # Import sync routes for Twenty/Chatwoot/Cal.com webhooks
 try:
     from api.routes.sync import router as sync_router
-    app.include_router(sync_router, prefix="/sync", tags=["Sync"])
+    # Note: sync_router already has prefix="/sync" defined internally
+    app.include_router(sync_router, tags=["Sync"])
     logger.info("Sync routes loaded")
 except Exception as e:
     logger.error(f"Failed to load sync routes: {e}")
