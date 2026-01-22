@@ -277,8 +277,12 @@ O Twenty estava com dois problemas:
 - **Fluxo:** WhatsApp → Evolution API → Chatwoot
 
 ### Twenty ↔ Chatwoot ↔ Cal.com (Webhooks)
-- **Status:** ✅ Webhooks Configurados
-- **Nota:** Endpoints webhook no MedFlow API (`/sync/webhooks/*`) precisam estar acessíveis
+- **Status:** ✅ Webhooks Configurados e Funcionando
+- **MedFlow API:** https://api.trafegoparaconsultorios.com.br
+- **Endpoints Ativos:**
+  - `POST /sync/webhooks/twenty` - ✅ Funcionando
+  - `POST /sync/webhooks/chatwoot` - ✅ Funcionando
+  - `POST /sync/webhooks/calcom` - ✅ Funcionando
 - **Secret Compartilhado:** `tpc-webhook-secret-2026`
 
 **Fluxos Configurados:**
