@@ -60,7 +60,10 @@ services:
     expose:
       - "8000"
     labels:
+      - "traefik.enable=true"
       - "traefik.http.services.integration.loadbalancer.server.port=8000"
+    networks:
+      - coolify
     volumes:
       - agent_storage:/tmp/agno
     healthcheck:
@@ -77,6 +80,10 @@ services:
 # =============================================================================
 # VOLUMES
 # =============================================================================
+networks:
+  coolify:
+    external: true
+
 volumes:
   agent_storage:
     driver: local
