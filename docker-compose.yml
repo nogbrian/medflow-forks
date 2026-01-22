@@ -28,7 +28,7 @@ services:
       CHATWOOT_API_KEY: ${CHATWOOT_API_KEY:-}
       EVOLUTION_API_URL: ${EVOLUTION_API_URL:-}
       EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:-}
-      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000"]}
+      CORS_ORIGINS_RAW: ${CORS_ORIGINS_RAW:-http://localhost:3000}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -43,6 +43,35 @@ services:
       resources:
         limits:
           memory: 1G
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://integration:8000}
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://integration:8000}
+      API_URL: http://integration:8000
+      NODE_ENV: production
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      integration:
+        condition: service_healthy
+    networks:
+      - coolify
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
 networks:
   coolify:
