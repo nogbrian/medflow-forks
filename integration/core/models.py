@@ -40,6 +40,42 @@ class ClinicStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
+class AprovacaoStatus(str, enum.Enum):
+    """Approval status."""
+    PENDENTE = "pendente"
+    APROVADO = "aprovado"
+    REJEITADO = "rejeitado"
+    EDITADO = "editado"
+
+
+class AprovacaoTipo(str, enum.Enum):
+    """Approval type."""
+    POST_INSTAGRAM = "post_instagram"
+    STORY_INSTAGRAM = "story_instagram"
+    REELS_INSTAGRAM = "reels_instagram"
+    POST_FACEBOOK = "post_facebook"
+    MENSAGEM_WHATSAPP = "mensagem_whatsapp"
+    EMAIL_MARKETING = "email_marketing"
+
+
+class MensagemDirecao(str, enum.Enum):
+    """Message direction."""
+    INBOUND = "inbound"
+    OUTBOUND = "outbound"
+
+
+class MensagemTipo(str, enum.Enum):
+    """Message type."""
+    TEXT = "text"
+    IMAGE = "image"
+    AUDIO = "audio"
+    VIDEO = "video"
+    DOCUMENT = "document"
+    LOCATION = "location"
+    STICKER = "sticker"
+    REACTION = "reaction"
+
+
 class AgencyPlan(str, enum.Enum):
     """Agency subscription plan."""
     STARTER = "starter"
@@ -269,3 +305,77 @@ class User(Base):
             return True
         # Clinic users can only access their own clinic
         return self.clinic_id == clinic_id
+
+
+# Alias for legacy compatibility
+Cliente = Clinic
+
+
+class Conversa(Base):
+    """WhatsApp conversation."""
+    __tablename__ = "conversas"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    clinic_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("clinics.id", ondelete="CASCADE"),
+        index=True,
+    )
+    telefone: Mapped[str] = mapped_column(String(20), index=True)
+    nome_contato: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    ultima_msg_usuario: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ultima_msg_enviada: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    janela_expira_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    contexto: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Mensagem(Base):
+    """WhatsApp message."""
+    __tablename__ = "mensagens"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    conversa_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("conversas.id", ondelete="CASCADE"),
+        index=True,
+    )
+    direcao: Mapped[MensagemDirecao] = mapped_column(Enum(MensagemDirecao))
+    tipo: Mapped[MensagemTipo] = mapped_column(Enum(MensagemTipo), default=MensagemTipo.TEXT)
+    conteudo: Mapped[str] = mapped_column(Text)
+    wamid: Mapped[str | None] = mapped_column(String(100), nullable=True, unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Aprovacao(Base):
+    """Content approval request."""
+    __tablename__ = "aprovacoes"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    cliente_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("clinics.id", ondelete="CASCADE"),
+        index=True,
+    )
+    tipo: Mapped[AprovacaoTipo] = mapped_column(Enum(AprovacaoTipo))
+    status: Mapped[AprovacaoStatus] = mapped_column(Enum(AprovacaoStatus), default=AprovacaoStatus.PENDENTE)
+    conteudo: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    criado_por_agent: Mapped[str] = mapped_column(String(100))
+    aprovado_por: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
+    agendado_para: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
