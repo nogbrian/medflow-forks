@@ -51,4 +51,5 @@ tenacity>=8.2.0
 apify-client>=1.6.0
 
 # Cache buster - change this to force full rebuild
+# Build timestamp: 2026-01-22T06:55:00Z
 typing-extensions>=4.0.0
