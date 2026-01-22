@@ -101,6 +101,7 @@ async def handle_twenty_webhook(
     background_tasks: BackgroundTasks,
     db: DBSession,
     x_twenty_signature: str | None = Header(None, alias="X-Twenty-Signature"),
+    x_twenty_webhook_signature: str | None = Header(None, alias="X-Twenty-Webhook-Signature"),
 ):
     """
     Handle webhooks from Twenty CRM.
@@ -112,13 +113,19 @@ async def handle_twenty_webhook(
     """
     body = await request.body()
 
+    # Log all headers for debugging
+    logger.info(f"Twenty webhook headers: {dict(request.headers)}")
+
+    # Accept either header format that Twenty might use
+    signature = x_twenty_webhook_signature or x_twenty_signature
+
     # Verify signature
     if settings.webhook_secret and settings.webhook_secret != "change-me-webhook-secret":
-        if not x_twenty_signature:
-            logger.warning("Twenty webhook missing signature")
+        if not signature:
+            logger.warning("Twenty webhook missing signature (checked X-Twenty-Signature and X-Twenty-Webhook-Signature)")
             raise HTTPException(status_code=401, detail="Missing signature")
 
-        if not verify_webhook_signature(body, x_twenty_signature, settings.webhook_secret):
+        if not verify_webhook_signature(body, signature, settings.webhook_secret):
             logger.warning("Twenty webhook signature verification failed")
             raise HTTPException(status_code=401, detail="Invalid signature")
 
