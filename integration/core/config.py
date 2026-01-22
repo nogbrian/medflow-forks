@@ -5,7 +5,9 @@ import sys
 from functools import lru_cache
 from typing import Self
 
-from pydantic import model_validator
+import json
+
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -73,6 +75,29 @@ class Settings(BaseSettings):
 
     # CORS
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v):
+        """Parse CORS origins from various formats (handles Coolify escaping issues)."""
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            # Remove surrounding quotes if present
+            v = v.strip().strip("'\"")
+            # Handle double-escaped JSON from Coolify
+            if v.startswith('[\\') or '\\"' in v:
+                v = v.replace('\\"', '"').replace('\\/', '/')
+            # Try parsing as JSON
+            try:
+                parsed = json.loads(v)
+                if isinstance(parsed, list):
+                    return parsed
+                return [parsed]
+            except json.JSONDecodeError:
+                # Fallback: comma-separated
+                return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
     @model_validator(mode="after")
     def validate_security(self) -> Self:
