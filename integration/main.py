@@ -204,28 +204,47 @@ async def root():
 # IMPORT ROUTES (lazy to avoid circular imports)
 # =============================================================================
 
-from api.routes import auth, clinics, agents, creative_lab, sync, navigation, branding, admin
+# Import routes directly to avoid __init__.py issues
+from api.routes.auth import router as auth_router
+from api.routes.admin import router as admin_router
+from api.routes.clinics import router as clinics_router
 
 # Auth & Users
-app.include_router(auth.router, prefix="/api", tags=["Auth"])
+app.include_router(auth_router, prefix="/api", tags=["Auth"])
 
 # Admin (database management)
-app.include_router(admin.router, prefix="/api", tags=["Admin"])
+app.include_router(admin_router, prefix="/api", tags=["Admin"])
 
 # Clinics (multi-tenant)
-app.include_router(clinics.router, prefix="/api", tags=["Clinics"])
+app.include_router(clinics_router, prefix="/api", tags=["Clinics"])
 
-# Agents (AI)
-app.include_router(agents.router, prefix="/api", tags=["Agents"])
+# Other routes - import on demand to avoid issues
+try:
+    from api.routes.agents import router as agents_router
+    app.include_router(agents_router, prefix="/api", tags=["Agents"])
+except Exception as e:
+    logger.error(f"Failed to import agents router: {e}")
 
-# Creative Studio
-app.include_router(creative_lab.router, prefix="/api", tags=["Creative Lab"])
+try:
+    from api.routes.creative_lab import router as creative_lab_router
+    app.include_router(creative_lab_router, prefix="/api", tags=["Creative Lab"])
+except Exception as e:
+    logger.error(f"Failed to import creative_lab router: {e}")
 
-# Service Sync
-app.include_router(sync.router, prefix="/api", tags=["Sync"])
+try:
+    from api.routes.sync import router as sync_router
+    app.include_router(sync_router, prefix="/api", tags=["Sync"])
+except Exception as e:
+    logger.error(f"Failed to import sync router: {e}")
 
-# Cross-Service Navigation
-app.include_router(navigation.router, prefix="/api", tags=["Navigation"])
+try:
+    from api.routes.navigation import router as navigation_router
+    app.include_router(navigation_router, prefix="/api", tags=["Navigation"])
+except Exception as e:
+    logger.error(f"Failed to import navigation router: {e}")
 
-# Branding (White-label themes)
-app.include_router(branding.router, prefix="/api", tags=["Branding"])
+try:
+    from api.routes.branding import router as branding_router
+    app.include_router(branding_router, prefix="/api", tags=["Branding"])
+except Exception as e:
+    logger.error(f"Failed to import branding router: {e}")
