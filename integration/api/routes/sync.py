@@ -132,18 +132,42 @@ async def handle_twenty_webhook(
             raise HTTPException(status_code=401, detail="Invalid signature")
 
     payload = await request.json()
-    event = payload.get("event", payload.get("type", ""))
-    data = payload.get("data", payload)
 
-    logger.info(f"Twenty webhook received: {event}")
+    # Log payload structure for debugging
+    logger.info(f"Twenty webhook payload keys: {list(payload.keys())}")
+    logger.info(f"Twenty webhook payload preview: {str(payload)[:500]}")
 
-    if event in ("person.created", "person.updated"):
+    # Twenty CRM webhook format uses different field names
+    # Try multiple possible event field locations
+    event = (
+        payload.get("event") or
+        payload.get("type") or
+        payload.get("triggerEvent") or
+        payload.get("action") or
+        ""
+    )
+
+    # Twenty may nest data differently - check for record/object patterns
+    data = payload.get("data") or payload.get("record") or payload.get("object") or payload
+
+    logger.info(f"Twenty webhook received: event={event}, data_keys={list(data.keys()) if isinstance(data, dict) else 'not-dict'}")
+
+    # Normalize event name - Twenty may use different formats
+    event_lower = event.lower() if event else ""
+
+    # Check for person/contact events (various naming conventions)
+    is_person_event = any(x in event_lower for x in ["person", "contact", "people"])
+    is_create_or_update = any(x in event_lower for x in ["created", "updated", "create", "update"])
+
+    if is_person_event or (not event and "name" in data):
+        # If it looks like a person record (has name field), sync it
+        logger.info(f"Triggering sync to Chatwoot for person data")
         background_tasks.add_task(
             _sync_twenty_contact_to_chatwoot,
             db,
             data,
         )
-    elif event == "opportunity.updated":
+    elif "opportunity" in event_lower:
         background_tasks.add_task(
             _handle_opportunity_update,
             db,
