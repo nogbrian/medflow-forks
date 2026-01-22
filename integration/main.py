@@ -1,22 +1,21 @@
 """
-MedFlow Integration Layer - Main Application.
-
-Unified API that integrates:
-- Twenty CRM
-- Cal.com Scheduling
-- Chatwoot Messaging
-- AI Agents (content creation, lead qualification, etc.)
-- Creative Studio
+MedFlow Integration Layer - Simplified Main Application for debugging.
 """
 
 import logging
 import time
 from contextlib import asynccontextmanager
 from typing import Callable
+from uuid import uuid4
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from passlib.context import CryptContext
+from pydantic import BaseModel
+from sqlalchemy import select, text
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.config import get_settings
@@ -24,204 +23,212 @@ from core.config import get_settings
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
-# Configure logging
 logging.basicConfig(
-    level=logging.INFO if settings.is_production else logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
-
-# =============================================================================
-# SECURITY MIDDLEWARE
-# =============================================================================
-
-
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Add security headers to all responses."""
-
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        response = await call_next(request)
-
-        # Security headers
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
-        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-
-        # Remove server header
-        if "server" in response.headers:
-            del response.headers["server"]
-
-        # Content Security Policy for API
-        if settings.is_production:
-            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-
-        return response
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
-    """Log all requests with timing."""
-
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
-
-        # Generate request ID
-        request_id = request.headers.get("X-Request-ID", f"req-{int(start_time * 1000)}")
-
-        # Log request
-        logger.info(
-            f"[{request_id}] {request.method} {request.url.path} "
-            f"client={request.client.host if request.client else 'unknown'}"
-        )
-
-        try:
-            response = await call_next(request)
-            duration = time.time() - start_time
-
-            # Log response
-            logger.info(
-                f"[{request_id}] {request.method} {request.url.path} "
-                f"status={response.status_code} duration={duration:.3f}s"
-            )
-
-            # Add timing header
-            response.headers["X-Request-ID"] = request_id
-            response.headers["X-Response-Time"] = f"{duration:.3f}s"
-
-            return response
-
-        except Exception as e:
-            duration = time.time() - start_time
-            logger.error(
-                f"[{request_id}] {request.method} {request.url.path} "
-                f"error={str(e)} duration={duration:.3f}s"
-            )
-            raise
-
-
-# =============================================================================
-# APPLICATION SETUP
-# =============================================================================
+        response = await call_next(request)
+        duration = time.time() - start_time
+        logger.info(f"{request.method} {request.url.path} - {response.status_code} ({duration:.3f}s)")
+        return response
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan handler."""
-    # Startup
-    logger.info(f"Starting {settings.app_name} ({settings.app_env})")
-
-    # Validate critical settings
-    if settings.jwt_secret == "change-me-jwt-secret":
-        logger.warning("WARNING: Using default JWT secret. Set JWT_SECRET in production!")
-
-    if settings.webhook_secret == "change-me-webhook-secret":
-        logger.warning("WARNING: Using default webhook secret. Set WEBHOOK_SECRET in production!")
-
+    logger.info("Starting MedFlow Integration API (simplified)")
     yield
-
-    # Shutdown
     logger.info("Shutting down")
 
 
 app = FastAPI(
     title="MedFlow Integration API",
-    description="Unified API for medical growth platform",
-    version="1.0.0",
+    version="3.1.0",
     lifespan=lifespan,
-    docs_url="/docs" if settings.is_development else None,
-    redoc_url="/redoc" if settings.is_development else None,
-    # Disable automatic OpenAPI in production for security
-    openapi_url="/openapi.json" if settings.is_development else None,
 )
 
-
-# Add middleware (order matters - first added = last executed)
-app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestLoggingMiddleware)
-
-# CORS - configured per environment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
-    expose_headers=["X-Request-ID", "X-Response-Time"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
-
-# =============================================================================
-# ERROR HANDLERS
-# =============================================================================
-
-
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """Global exception handler - don't leak internal errors."""
-    logger.exception(f"Unhandled error: {exc}")
-
-    if settings.is_development:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": str(exc), "type": type(exc).__name__},
-        )
-
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"},
-    )
-
-
-# =============================================================================
-# HEALTH & STATUS
-# =============================================================================
 
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
-    return {"status": "healthy", "env": settings.app_env, "build": "20260122-v3", "version": "3.0.0"}
-
-
-@app.get("/debug-version")
-async def debug_version():
-    """Debug endpoint to verify code deployment."""
     return {
-        "commit": "9d359f4-plus",
-        "deployed_at": "2026-01-22T06:30:00Z",
-        "message": "If you see this, the new code is running"
+        "status": "healthy",
+        "env": settings.app_env,
+        "version": "3.1.0",
+        "build": "20260122-debug"
     }
 
 
 @app.get("/")
 async def root():
-    """Root endpoint - service info."""
     return {
         "name": "MedFlow Integration API",
-        "version": "1.0.0",
-        "environment": settings.app_env,
-        "docs": "/docs" if settings.is_development else None,
-        "services": {
-            "crm": "/crm/",
-            "agenda": "/agenda/",
-            "inbox": "/inbox/",
-            "api": "/api/",
-        },
+        "version": "3.1.0",
+        "status": "ok"
     }
 
 
-# =============================================================================
-# IMPORT ROUTES - Minimal version for debugging
-# =============================================================================
+class SeedRequest(BaseModel):
+    password: str = "tpc2026#"
 
-# Only import auth for now (we know it works)
-from api.routes.auth import router as auth_router
-app.include_router(auth_router, prefix="/api", tags=["Auth"])
 
-# Try admin - if it fails, don't crash the app
+@app.post("/api/admin/seed")
+async def seed_database(data: SeedRequest):
+    """Seed the database with initial data."""
+    try:
+        engine = create_async_engine(settings.database_url, echo=False)
+        async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+        async with async_session() as db:
+            # Check if tables exist
+            tables_result = await db.execute(
+                text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
+            )
+            tables = [row[0] for row in tables_result.fetchall()]
+
+            if "agencies" not in tables:
+                return {"status": "error", "message": "Tables not found. Run migrations first.", "tables": tables}
+
+            # Check if already seeded
+            check_result = await db.execute(text("SELECT COUNT(*) FROM agencies"))
+            count = check_result.scalar()
+            if count > 0:
+                return {"status": "already_seeded", "message": "Database already has agencies"}
+
+            # Create agency
+            agency_id = str(uuid4())
+            await db.execute(
+                text("""
+                    INSERT INTO agencies (id, name, slug, email, phone, plan, max_clinics, branding, settings, created_at, updated_at)
+                    VALUES (:id, :name, :slug, :email, :phone, 'enterprise', 100, :branding, :settings, NOW(), NOW())
+                """),
+                {
+                    "id": agency_id,
+                    "name": "Tráfego para Consultórios",
+                    "slug": "tpc",
+                    "email": "contato@trafegoparaconsultorios.com.br",
+                    "phone": "+55 11 99999-0000",
+                    "branding": '{"logo_url": null, "primary_color": "#F24E1E", "secondary_color": "#111111", "company_name": "Tráfego para Consultórios"}',
+                    "settings": '{"default_language": "pt-BR", "timezone": "America/Sao_Paulo"}',
+                }
+            )
+
+            # Create superusers
+            password_hash = pwd_context.hash(data.password)
+            users = [
+                ("cto@trafegoparaconsultorios.com.br", "CTO"),
+                ("heloisa@trafegoparaconsultorios.com.br", "Heloísa"),
+                ("briansouzanogueira@gmail.com", "Brian Souza Nogueira"),
+            ]
+
+            created_users = []
+            for email, name in users:
+                user_id = str(uuid4())
+                await db.execute(
+                    text("""
+                        INSERT INTO users (id, agency_id, email, password_hash, role, name, is_active, email_verified, created_at, updated_at)
+                        VALUES (:id, :agency_id, :email, :password_hash, 'superuser', :name, true, true, NOW(), NOW())
+                    """),
+                    {
+                        "id": user_id,
+                        "agency_id": agency_id,
+                        "email": email,
+                        "password_hash": password_hash,
+                        "name": name,
+                    }
+                )
+                created_users.append(email)
+
+            await db.commit()
+
+            return {
+                "status": "success",
+                "agency_id": agency_id,
+                "users_created": created_users,
+            }
+    except Exception as e:
+        logger.exception("Seed error")
+        return {"status": "error", "message": str(e)}
+
+
+@app.get("/api/admin/db-status")
+async def db_status():
+    """Check database status."""
+    try:
+        engine = create_async_engine(settings.database_url, echo=False)
+        async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+        async with async_session() as db:
+            await db.execute(text("SELECT 1"))
+
+            tables_result = await db.execute(
+                text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
+            )
+            tables = [row[0] for row in tables_result.fetchall()]
+
+            counts = {}
+            for table in ["agencies", "clinics", "users"]:
+                if table in tables:
+                    count_result = await db.execute(text(f"SELECT COUNT(*) FROM {table}"))
+                    counts[table] = count_result.scalar()
+                else:
+                    counts[table] = "table not found"
+
+            alembic_version = None
+            if "alembic_version" in tables:
+                ver_result = await db.execute(text("SELECT version_num FROM alembic_version"))
+                row = ver_result.fetchone()
+                alembic_version = row[0] if row else None
+
+            return {
+                "status": "connected",
+                "tables": tables,
+                "alembic_version": alembic_version,
+                "counts": counts,
+            }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@app.post("/api/admin/run-migrations")
+async def run_migrations():
+    """Run alembic migrations."""
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["python", "-m", "alembic", "upgrade", "head"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        return {
+            "status": "success" if result.returncode == 0 else "error",
+            "returncode": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+# Import auth routes (we know these work)
 try:
-    from api.routes.admin import router as admin_router
-    app.include_router(admin_router, prefix="/api", tags=["Admin"])
-    logger.info("Admin routes loaded successfully")
+    from api.routes.auth import router as auth_router
+    app.include_router(auth_router, prefix="/api", tags=["Auth"])
+    logger.info("Auth routes loaded")
 except Exception as e:
-    logger.error(f"Failed to load admin routes: {e}")
+    logger.error(f"Failed to load auth routes: {e}")
