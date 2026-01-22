@@ -204,10 +204,13 @@ async def root():
 # IMPORT ROUTES (lazy to avoid circular imports)
 # =============================================================================
 
-from api.routes import auth, clinics, agents, creative_lab, sync, navigation, branding
+from api.routes import auth, clinics, agents, creative_lab, sync, navigation, branding, admin
 
 # Auth & Users
 app.include_router(auth.router, prefix="/api", tags=["Auth"])
+
+# Admin (database management)
+app.include_router(admin.router, prefix="/api", tags=["Admin"])
 
 # Clinics (multi-tenant)
 app.include_router(clinics.router, prefix="/api", tags=["Clinics"])
