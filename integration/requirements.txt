@@ -49,4 +49,4 @@ tenacity>=8.2.0
 
 # External Services
 apify-client>=1.6.0
-# Build timestamp: 1769060238
+# Build timestamp: 1769101000 (forced rebuild)

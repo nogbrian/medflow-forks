@@ -32,6 +32,10 @@ RUN useradd --create-home --shell /bin/bash appuser
 COPY --from=builder /root/.local /home/appuser/.local
 ENV PATH=/home/appuser/.local/bin:$PATH
 
+# Cache buster for forced rebuilds
+ARG BUILD_VERSION=1
+ENV BUILD_VERSION=${BUILD_VERSION}
+
 # Copy application code
 COPY . .
 
