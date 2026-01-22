@@ -244,7 +244,7 @@ async def run_migrations():
 
 @app.post("/api/admin/reset-db")
 async def reset_db():
-    """Reset database - drop all tables and reset alembic version."""
+    """Reset database - drop all tables, types, and reset alembic version."""
     try:
         engine = create_async_engine(settings.database_url, echo=False)
         async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -256,16 +256,28 @@ async def reset_db():
             )
             tables = [row[0] for row in tables_result.fetchall()]
 
-            dropped = []
+            dropped_tables = []
             for table in tables:
                 await db.execute(text(f"DROP TABLE IF EXISTS {table} CASCADE"))
-                dropped.append(table)
+                dropped_tables.append(table)
+
+            # Drop all enum types
+            types_result = await db.execute(
+                text("SELECT typname FROM pg_type WHERE typtype = 'e' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')")
+            )
+            types = [row[0] for row in types_result.fetchall()]
+
+            dropped_types = []
+            for type_name in types:
+                await db.execute(text(f"DROP TYPE IF EXISTS {type_name} CASCADE"))
+                dropped_types.append(type_name)
 
             await db.commit()
 
             return {
                 "status": "success",
-                "dropped_tables": dropped,
+                "dropped_tables": dropped_tables,
+                "dropped_types": dropped_types,
             }
     except Exception as e:
         logger.exception("Reset DB error")
