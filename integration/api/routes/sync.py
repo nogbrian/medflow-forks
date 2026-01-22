@@ -137,9 +137,10 @@ async def handle_twenty_webhook(
     logger.info(f"Twenty webhook payload keys: {list(payload.keys())}")
     logger.info(f"Twenty webhook payload preview: {str(payload)[:500]}")
 
-    # Twenty CRM webhook format uses different field names
-    # Try multiple possible event field locations
+    # Twenty CRM webhook format: eventName contains "person.created", "person.updated", etc.
+    # Data is in the "record" field
     event = (
+        payload.get("eventName") or  # Twenty CRM uses eventName
         payload.get("event") or
         payload.get("type") or
         payload.get("triggerEvent") or
@@ -147,8 +148,8 @@ async def handle_twenty_webhook(
         ""
     )
 
-    # Twenty may nest data differently - check for record/object patterns
-    data = payload.get("data") or payload.get("record") or payload.get("object") or payload
+    # Twenty stores the actual data in "record" field
+    data = payload.get("record") or payload.get("data") or payload.get("object") or payload
 
     logger.info(f"Twenty webhook received: event={event}, data_keys={list(data.keys()) if isinstance(data, dict) else 'not-dict'}")
 
