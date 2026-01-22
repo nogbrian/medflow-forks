@@ -226,6 +226,36 @@ async def run_migrations():
         return {"status": "error", "message": str(e)}
 
 
+@app.post("/api/admin/reset-db")
+async def reset_db():
+    """Reset database - drop all tables and reset alembic version."""
+    try:
+        engine = create_async_engine(settings.database_url, echo=False)
+        async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+        async with async_session() as db:
+            # Get all tables
+            tables_result = await db.execute(
+                text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
+            )
+            tables = [row[0] for row in tables_result.fetchall()]
+
+            dropped = []
+            for table in tables:
+                await db.execute(text(f"DROP TABLE IF EXISTS {table} CASCADE"))
+                dropped.append(table)
+
+            await db.commit()
+
+            return {
+                "status": "success",
+                "dropped_tables": dropped,
+            }
+    except Exception as e:
+        logger.exception("Reset DB error")
+        return {"status": "error", "message": str(e)}
+
+
 # Import auth routes (we know these work)
 try:
     from api.routes.auth import router as auth_router
