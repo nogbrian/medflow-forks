@@ -53,12 +53,13 @@ def verify_webhook_signature(
         return False
 
     # Parse signature format (some services prefix with algorithm=)
-    if "=" in signature and not signature.startswith("sha"):
-        # Format: sha256=<hex>
-        parts = signature.split("=", 1)
-        if len(parts) == 2:
-            algorithm = parts[0]
-            signature = parts[1]
+    # Format: sha256=<hex> or sha1=<hex>
+    if signature.startswith("sha256="):
+        algorithm = "sha256"
+        signature = signature[7:]
+    elif signature.startswith("sha1="):
+        algorithm = "sha1"
+        signature = signature[5:]
 
     # Build the string to sign
     # Twenty CRM uses timestamp:payload format
