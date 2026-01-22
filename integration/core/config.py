@@ -72,6 +72,10 @@ class Settings(BaseSettings):
 
     # Image Generation
     replicate_api_key: str | None = None
+    nanobanana_api_key: str | None = None
+
+    # Social Media
+    meta_access_token: str | None = None
 
     # Scraping (Apify)
     apify_token: str | None = None
