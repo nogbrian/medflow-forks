@@ -124,10 +124,10 @@ class SyncService:
 
     async def _get_chatwoot(self) -> ChatwootClient:
         if self._chatwoot is None:
-            # Get account ID from clinic settings
-            account_id = None
+            # Get account ID from clinic settings, default to 1 for single-tenant setup
+            account_id = 1  # Default account for TPC
             if self.clinic and self.clinic.settings:
-                account_id = self.clinic.settings.get("chatwoot_account_id")
+                account_id = self.clinic.settings.get("chatwoot_account_id", 1)
             self._chatwoot = ChatwootClient(account_id=account_id)
         return self._chatwoot
 
