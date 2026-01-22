@@ -158,7 +158,7 @@ async def seed_database(data: SeedRequest):
                 await db.execute(
                     text("""
                         INSERT INTO users (id, agency_id, email, password_hash, role, name, is_active, email_verified, created_at, updated_at)
-                        VALUES (:id, :agency_id, :email, :password_hash, 'SUPERUSER', :name, true, true, NOW(), NOW())
+                        VALUES (:id, :agency_id, :email, :password_hash, 'superuser', :name, true, true, NOW(), NOW())
                     """),
                     {
                         "id": user_id,

@@ -244,7 +244,9 @@ class User(Base):
     # Auth
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole))
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole, values_callable=lambda x: [e.value for e in x])
+    )
 
     # Profile
     name: Mapped[str] = mapped_column(String(200))
