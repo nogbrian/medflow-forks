@@ -2,87 +2,42 @@
 # MEDFLOW FORKS - Unified Medical Growth Platform
 # =============================================================================
 # Coolify-optimized Docker Compose configuration
-#
-# NOTE: This compose file is designed to work with Coolify's managed databases.
-# PostgreSQL and Redis are managed separately in Coolify, not in this file.
-#
-# Services:
-# - integration: Main API (FastAPI)
-#
-# Environment Variables (configure in Coolify):
-# - DATABASE_URL: Connection string to Coolify's PostgreSQL
-# - REDIS_URL: Connection string to Coolify's Redis
-# - JWT_SECRET, WEBHOOK_SECRET: Security secrets
-# - ANTHROPIC_API_KEY (or other LLM provider key)
 # =============================================================================
 
 services:
-  # ===========================================================================
-  # MEDFLOW INTEGRATION API
-  # ===========================================================================
-
   integration:
     build:
       context: ./integration
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
-      # App
       APP_ENV: ${APP_ENV:-production}
       DEBUG: ${DEBUG:-false}
-      # Database - Use Coolify's managed PostgreSQL
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
-      # Redis - Use Coolify's managed Redis
       REDIS_URL: ${REDIS_URL:?REDIS_URL is required}
-      # Security (REQUIRED in production)
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       WEBHOOK_SECRET: ${WEBHOOK_SECRET:?WEBHOOK_SECRET is required}
-      # LLM (at least one required for agents)
       LLM_PROVIDER: ${LLM_PROVIDER:-anthropic}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       XAI_API_KEY: ${XAI_API_KEY:-}
-      # Image Generation (optional)
       REPLICATE_API_KEY: ${REPLICATE_API_KEY:-}
-      # External Services (optional)
       TWENTY_API_URL: ${TWENTY_API_URL:-}
       TWENTY_API_KEY: ${TWENTY_API_KEY:-}
       CALCOM_API_URL: ${CALCOM_API_URL:-}
       CALCOM_API_KEY: ${CALCOM_API_KEY:-}
       CHATWOOT_API_URL: ${CHATWOOT_API_URL:-}
       CHATWOOT_API_KEY: ${CHATWOOT_API_KEY:-}
-      # WhatsApp (optional)
       EVOLUTION_API_URL: ${EVOLUTION_API_URL:-}
       EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:-}
-      # CORS
       CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000"]}
-    expose:
-      - "8000"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.integration.loadbalancer.server.port=8000"
-    networks:
-      - coolify
     volumes:
       - agent_storage:/tmp/agno
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
     deploy:
       resources:
         limits:
           memory: 1G
-
-# =============================================================================
-# VOLUMES
-# =============================================================================
-networks:
-  coolify:
-    external: true
 
 volumes:
   agent_storage:
