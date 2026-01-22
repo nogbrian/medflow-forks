@@ -204,10 +204,29 @@ async def root():
 # IMPORT ROUTES (lazy to avoid circular imports)
 # =============================================================================
 
+logger.info("Starting route imports...")
+
 # Import routes directly to avoid __init__.py issues
-from api.routes.auth import router as auth_router
-from api.routes.admin import router as admin_router
-from api.routes.clinics import router as clinics_router
+try:
+    from api.routes.auth import router as auth_router
+    logger.info("auth_router imported successfully")
+except Exception as e:
+    logger.error(f"Failed to import auth_router: {e}")
+    raise
+
+try:
+    from api.routes.admin import router as admin_router
+    logger.info("admin_router imported successfully")
+except Exception as e:
+    logger.error(f"Failed to import admin_router: {e}")
+    raise
+
+try:
+    from api.routes.clinics import router as clinics_router
+    logger.info("clinics_router imported successfully")
+except Exception as e:
+    logger.error(f"Failed to import clinics_router: {e}")
+    raise
 
 # Auth & Users
 app.include_router(auth_router, prefix="/api", tags=["Auth"])
