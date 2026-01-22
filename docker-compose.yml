@@ -29,6 +29,9 @@ services:
       EVOLUTION_API_URL: ${EVOLUTION_API_URL:-}
       EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:-}
       CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000"]}
+    labels:
+      - "traefik.http.services.http-0-qgskkcw0o88404g8cwk0880w-integration.loadbalancer.server.port=8000"
+      - "traefik.http.services.https-0-qgskkcw0o88404g8cwk0880w-integration.loadbalancer.server.port=8000"
     volumes:
       - agent_storage:/tmp/agno
     networks:
