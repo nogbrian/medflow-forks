@@ -35,7 +35,7 @@ class AIMemory(Base):
     embedding = Column(ARRAY(float), nullable=True)
 
     # Metadata
-    metadata = Column(JSON, default={})
+    extra_metadata = Column("metadata", JSON, default={})
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
@@ -76,7 +76,7 @@ class AIKnowledge(Base):
     parent_id = Column(UUID(as_uuid=True), nullable=True)  # For chunked documents
 
     # Metadata
-    metadata = Column(JSON, default={})
+    extra_metadata = Column("metadata", JSON, default={})
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
