@@ -41,6 +41,17 @@
 │  │  /sync/webhooks/calcom     → update Twenty + notify   │               │
 │  └──────────────────────────────────────────────────────┘               │
 │                                                                          │
+│  ┌──────────────────────────────────────────────────────┐               │
+│  │              Intel - Viral Finder                    │               │
+│  │         (FastAPI + Next.js + Apify + AI)             │               │
+│  │                                                      │               │
+│  │  intel-api (:8001)  intel-web (:3002)                │               │
+│  │  /api/instagram-orchestrator  Dashboard              │               │
+│  │  /api/ads/meta-ads/search     Workspaces             │               │
+│  │  /api/ai/chat                 Profiles               │               │
+│  │  /api/ai/brand-profiles       Creative Lab           │               │
+│  └──────────────────────────────────────────────────────┘               │
+│                                                                          │
 │  ┌──────────────┐   ┌──────────────┐                                   │
 │  │Creative Studio│   │ Evolution API│── WhatsApp ──▶ Chatwoot           │
 │  │ (Gemini AI)  │   │  (WhatsApp)  │                                   │
@@ -100,13 +111,34 @@
   - `services/sync_service.py` - Cross-service sync
   - `api/routes/sync.py` - Webhook endpoints
 
+### Intel - Viral Finder (NEW)
+- **Role:** Instagram intelligence, ads transparency, AI-powered content analysis
+- **URLs:**
+  - API: `https://intel.trafegoparaconsultorios.com.br/api/` (via intel-api)
+  - Web: `https://intel.trafegoparaconsultorios.com.br` (via intel-web)
+- **Stack:**
+  - Backend: FastAPI (Python 3.11+) + SQLAlchemy async + pgvector
+  - Frontend: Next.js 16 + React 19 + Prisma + shadcn/ui
+- **Auth:** Traefik forwardAuth → Integration API `/api/auth/verify`
+- **Features:**
+  - Instagram scraping via Apify (profiles, posts, reels)
+  - Meta Ad Library search
+  - Google Ads Transparency search
+  - Multi-LLM AI chat (OpenAI, Anthropic, Google, xAI)
+  - Brand profiles with context injection
+  - Semantic memory search with pgvector embeddings
+  - Image generation
+- **Ports:** API 8001, Web 3002
+
 ## Docker Compose Services (medflow-forks)
 
 ```yaml
 services:
-  integration   # FastAPI API    → api.trafegoparaconsultorios.com.br    :8000
-  web           # Next.js Shell  → medflow.trafegoparaconsultorios.com.br :3000
-  creative-studio # Vite + nginx → studio.trafegoparaconsultorios.com.br  :3001
+  integration     # FastAPI API    → api.trafegoparaconsultorios.com.br     :8000
+  web             # Next.js Shell  → medflow.trafegoparaconsultorios.com.br  :3000
+  creative-studio # Vite + nginx   → studio.trafegoparaconsultorios.com.br   :3001
+  intel-api       # FastAPI API    → intel.trafegoparaconsultorios.com.br/api :8001
+  intel-web       # Next.js        → intel.trafegoparaconsultorios.com.br    :3002
 ```
 
 ## Data Flow
@@ -158,7 +190,9 @@ Managed by Alembic migrations in `/integration/alembic/`.
 
 ## Security
 
-- **JWT Auth:** HS256 tokens, 24h expiration, bcrypt password hashing
+- **JWT Auth:** HS256 tokens, 24h expiration, bcrypt password hashing (12 rounds)
+- **Cross-subdomain Auth:** `medflow_token` cookie on `.trafegoparaconsultorios.com.br` (7-day expiry, Secure, SameSite=Lax)
+- **ForwardAuth:** Traefik middleware verifies JWT via `/api/auth/verify` for intel-web, intel-api, creative-studio
 - **RBAC:** 4 roles with multi-tenant clinic isolation
 - **Webhook Verification:** HMAC-SHA256 signatures on all webhook endpoints
 - **Iframe Security:** CSP `frame-ancestors` restricts embedding to shell domain
@@ -176,4 +210,5 @@ All services run in Docker on the same host, connected via the `coolify` Docker 
 - [Design System](./DESIGN_SYSTEM.md)
 - [Iframe Configuration](./IFRAME_CONFIG.md)
 - [Creative Studio Analysis](./CREATIVE_STUDIO_ANALYSIS.md)
+- [Viral Finder Deploy](./VIRAL_FINDER_DEPLOY.md)
 - [API Endpoints](./ENDPOINTS.md)
