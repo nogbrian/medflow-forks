@@ -138,47 +138,6 @@ services:
         limits:
           memory: 256M
 
-  playground:
-    build:
-      context: ./integration
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    expose:
-      - "7777"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.playground.rule=Host(`playground.trafegoparaconsultorios.com.br`)"
-      - "traefik.http.routers.playground.entrypoints=https"
-      - "traefik.http.routers.playground.tls=true"
-      - "traefik.http.routers.playground.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.playground.middlewares=playground-auth"
-      - "traefik.http.middlewares.playground-auth.forwardauth.address=http://integration:8000/api/auth/verify"
-      - "traefik.http.middlewares.playground-auth.forwardauth.trustForwardHeader=true"
-      - "traefik.http.services.playground.loadbalancer.server.port=7777"
-    environment:
-      APP_ENV: ${APP_ENV:-production}
-      LLM_PROVIDER: ${LLM_PROVIDER:-anthropic}
-      MODEL_SMART: ${MODEL_SMART:-claude-sonnet-4-5-20250514}
-      MODEL_FAST: ${MODEL_FAST:-claude-haiku-4-20250514}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
-      XAI_API_KEY: ${XAI_API_KEY:-}
-    command: ["python", "-m", "uvicorn", "playground:app", "--host", "0.0.0.0", "--port", "7777"]
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7777/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    volumes:
-      - agent_storage:/tmp/agno
-    networks:
-      - coolify
-    deploy:
-      resources:
-        limits:
-          memory: 512M
 
 networks:
   coolify:
