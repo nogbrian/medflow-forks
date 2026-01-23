@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { Shell } from "@/components/layout/shell";
+import { getStoredToken } from "@/lib/auth";
 import {
   Bot,
   Send,
@@ -86,9 +87,13 @@ export default function AgentsPage() {
     try {
       abortRef.current = new AbortController();
 
+      const token = getStoredToken();
       const response = await fetch("/api/chat/stream", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           message: trimmed,
           agent_type: agentType,
