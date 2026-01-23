@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, ForeignKey, Index, Text, JSON
+from sqlalchemy import Column, String, DateTime, Float, ForeignKey, Index, Text, JSON
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 
@@ -32,7 +32,7 @@ class AIMemory(Base):
 
     # Embedding (3072 dimensions for text-embedding-3-large)
     # For pgvector: embedding = Column(Vector(3072))
-    embedding = Column(ARRAY(float), nullable=True)
+    embedding = Column(ARRAY(Float), nullable=True)
 
     # Metadata
     extra_metadata = Column("metadata", JSON, default={})
@@ -69,7 +69,7 @@ class AIKnowledge(Base):
     content_type = Column(String(50), default="text")  # 'text', 'pdf', 'image', 'url'
 
     # Embedding
-    embedding = Column(ARRAY(float), nullable=True)
+    embedding = Column(ARRAY(Float), nullable=True)
 
     # Chunking metadata
     chunk_index = Column(String, nullable=True)

@@ -144,7 +144,7 @@ services:
       context: ./intel-api
       dockerfile: Dockerfile
       args:
-        CACHEBUST: "20260123-2"
+        CACHEBUST: "20260123-3"
     restart: unless-stopped
     expose:
       - "8001"
