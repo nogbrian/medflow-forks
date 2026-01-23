@@ -70,19 +70,23 @@ creative-studio/
 
 Exposed via Vite's `define` config as `process.env.API_KEY`.
 
-## Deployment Requirements
+## Deployment (IMPLEMENTED)
 
-**Current state:** No Dockerfile or container config exists.
+**Dockerfile:** Multi-stage build (Node.js 20 → nginx:alpine)
+- Build stage: `npm install && npm run build` → `dist/`
+- Production: nginx serves static files on port 3001
+- Runtime API key injection via `docker-entrypoint.sh`
 
-**Needed for Coolify deployment:**
-- Dockerfile (Node.js, install deps, build, serve static)
-- `.env` with GEMINI_API_KEY
-- Domain: studio.trafegoparaconsultorios.com.br
+**Docker Compose service:** `creative-studio` in root `docker-compose.yml`
+
+**Domain:** `studio.trafegoparaconsultorios.com.br` (Traefik routing)
+
+**Iframe security:** nginx.conf sets `Content-Security-Policy: frame-ancestors 'self' https://medflow.trafegoparaconsultorios.com.br`
 
 ### Build Output
-- `vite build` → `dist/` directory (static files)
-- Can be served by any static file server (nginx, serve, etc.)
-- Dev server runs on port 3000
+- `vite build` → `dist/` directory (static files, ~618KB gzipped)
+- API key placeholder `__GEMINI_API_KEY_PLACEHOLDER__` baked into JS at build time
+- `docker-entrypoint.sh` replaces placeholder with `$GEMINI_API_KEY` at container start
 
 ## Integration Points
 
@@ -109,26 +113,25 @@ Exposed via Vite's `define` config as `process.env.API_KEY`.
 5. **No Docker** - needs containerization for Coolify deployment
 6. **Tailwind via CDN** - not bundled, loads from internet
 
-## Recommended Integration Strategy
+## Integration Strategy (IMPLEMENTED)
 
-### For Deploy (Coolify)
-1. Create Dockerfile: multi-stage (build with Node, serve with nginx)
-2. Pass GEMINI_API_KEY as env var at build time (Vite bakes it in)
-3. Deploy as static site behind Traefik
+### Deploy
+- Multi-stage Dockerfile: Node.js build → nginx:alpine serve
+- GEMINI_API_KEY injected at runtime via docker-entrypoint.sh
+- Deployed as Docker service behind Traefik
 
-### For Auth
-Since the app has no auth, options:
-- **Option A**: Add auth check in App.tsx (redirect to central login if no session cookie)
-- **Option B**: Traefik forward-auth middleware (check session before allowing access)
-- **Option C**: Wrap in shell app that handles auth
+### Auth
+- Shell app (Next.js) gates access via JWT auth
+- Creative Studio itself has no auth (API key is server-side)
+- Access controlled at the shell layer: must login to see Creative page
 
-### For Navigation
-The app is a full-page SPA. Integration options:
-- **Iframe inside shell** - simplest, no code changes to Studio
-- **Inject menu component** - requires modifying App.tsx layout
-- **Micro-frontend** - most complex but cleanest UX
+### Navigation
+- **Chosen: Iframe inside shell** - no code changes to Studio
+- Shell sidebar provides unified nav across all 4 modules
+- Creative Studio loads in full-height iframe at `/creative`
 
-### For Cross-System Integration
-The app runs entirely client-side, so integrations need:
-- API calls to Twenty/Chatwoot from the browser (CORS considerations)
-- OR a thin backend proxy for cross-service calls
+### Cross-System Integration (TODO)
+Future work needed:
+- API calls to Twenty/Chatwoot via Integration API proxy
+- Associate creatives with contacts
+- Send creatives via Chatwoot conversations

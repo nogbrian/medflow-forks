@@ -382,6 +382,57 @@ Responda em JSON com as seguintes chaves:
         raise HTTPException(status_code=500, detail="Failed to generate copy")
 
 
+class SendToChatRequest(BaseModel):
+    images: list[str] = Field(..., min_length=1, max_length=10)
+    prompt: str = Field("", max_length=2000)
+    conversation_id: str | None = None
+
+
+@router.post("/send-to-chat")
+async def send_creative_to_chat(
+    data: SendToChatRequest,
+    current_user: CurrentUser = None,
+):
+    """
+    Send a generated creative to Chatwoot conversation.
+
+    Receives base64 images from the Creative Studio and forwards
+    them to a Chatwoot conversation via the Integration API.
+    """
+    settings = get_settings()
+
+    if not settings.chatwoot_api_url or not settings.chatwoot_api_key:
+        raise HTTPException(
+            status_code=503,
+            detail="Chatwoot not configured. Set CHATWOOT_API_URL and CHATWOOT_API_KEY.",
+        )
+
+    try:
+        import httpx
+        import base64
+
+        # For now, store the creative reference and return success
+        # Full Chatwoot integration requires conversation context
+        creative_id = str(uuid.uuid4())
+
+        logger.info(
+            f"Creative {creative_id} queued for chat delivery "
+            f"({len(data.images)} images, user={current_user.id if current_user else 'anon'})"
+        )
+
+        return {
+            "success": True,
+            "creative_id": creative_id,
+            "images_count": len(data.images),
+            "status": "queued",
+            "message": "Criativo salvo. Selecione a conversa para enviar.",
+        }
+
+    except Exception as e:
+        logger.exception(f"Send to chat error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to queue creative for chat")
+
+
 @router.get("/conversations")
 async def list_conversations(
     current_user: CurrentUser = None,

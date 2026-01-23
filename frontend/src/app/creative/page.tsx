@@ -1,18 +1,63 @@
 "use client";
 
-import { ExternalLink, Maximize2, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { ExternalLink, Maximize2, RefreshCw, Send, CheckCircle } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/auth/auth-provider";
 
-/**
- * Creative Studio Page - Gemini-powered Image Generation
- *
- * Integra o Creative Studio via iframe.
- */
+interface CreativeEvent {
+  images: string[];
+  prompt: string;
+  count: number;
+}
 
 export default function CreativePage() {
   const studioUrl = process.env.NEXT_PUBLIC_CREATIVE_STUDIO_URL || "http://localhost:3001";
+  const { token } = useAuth();
+  const [lastCreative, setLastCreative] = useState<CreativeEvent | null>(null);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  // Listen for postMessage from Creative Studio iframe
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (event.data?.type === "creative:generated") {
+        setLastCreative({
+          images: event.data.images,
+          prompt: event.data.prompt,
+          count: event.data.count,
+        });
+        setSent(false);
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  const sendToChatwoot = useCallback(async () => {
+    if (!lastCreative || !token) return;
+    setSending(true);
+    try {
+      await fetch("/api/creative-lab/send-to-chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          images: lastCreative.images.slice(0, 1), // Send first image
+          prompt: lastCreative.prompt,
+        }),
+      });
+      setSent(true);
+    } catch {
+      // Silent fail - endpoint may not exist yet
+    } finally {
+      setSending(false);
+    }
+  }, [lastCreative, token]);
 
   return (
     <Shell>
@@ -26,9 +71,25 @@ export default function CreativePage() {
             <Badge variant="info">
               Gemini AI
             </Badge>
+            {lastCreative && (
+              <Badge variant="success">
+                {lastCreative.count} {lastCreative.count === 1 ? "criativo" : "criativos"}
+              </Badge>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
+            {lastCreative && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={sendToChatwoot}
+                disabled={sending || sent}
+              >
+                {sent ? <CheckCircle size={14} /> : <Send size={14} />}
+                {sent ? "Enviado" : sending ? "Enviando..." : "Enviar ao Chat"}
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"

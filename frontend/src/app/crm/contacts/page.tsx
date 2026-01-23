@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import {
   Search,
   Filter,
   Plus,
-  MoreVertical,
   Phone,
   Mail,
   MessageSquare,
   Calendar,
+  MoreVertical,
+  RefreshCw,
 } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,67 +25,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useLeads } from "@/hooks";
 
 /**
  * CRM Contacts Page
  *
- * Lista de contatos com filtros e ações rápidas.
+ * Lista de contatos do Twenty CRM via API proxy.
  */
 
-const contacts = [
-  {
-    id: "C-001",
-    name: "Maria Silva",
-    email: "maria.silva@email.com",
-    phone: "+55 61 99999-0001",
-    origin: "Instagram",
-    status: "hot",
-    lastContact: "21/01/2026",
-    specialty: "Dermatologia",
-  },
-  {
-    id: "C-002",
-    name: "João Santos",
-    email: "joao.santos@email.com",
-    phone: "+55 61 99999-0002",
-    origin: "WhatsApp",
-    status: "warm",
-    lastContact: "20/01/2026",
-    specialty: "Estética",
-  },
-  {
-    id: "C-003",
-    name: "Ana Costa",
-    email: "ana.costa@email.com",
-    phone: "+55 61 99999-0003",
-    origin: "Google Ads",
-    status: "cold",
-    lastContact: "18/01/2026",
-    specialty: "Dermatologia",
-  },
-  {
-    id: "C-004",
-    name: "Pedro Lima",
-    email: "pedro.lima@email.com",
-    phone: "+55 61 99999-0004",
-    origin: "Indicação",
-    status: "hot",
-    lastContact: "21/01/2026",
-    specialty: "Cirurgia",
-  },
-  {
-    id: "C-005",
-    name: "Clara Souza",
-    email: "clara.souza@email.com",
-    phone: "+55 61 99999-0005",
-    origin: "Site",
-    status: "warm",
-    lastContact: "19/01/2026",
-    specialty: "Estética",
-  },
-];
+function getLeadName(lead: { name?: { firstName?: string; lastName?: string } }): string {
+  if (!lead.name) return "—";
+  return [lead.name.firstName, lead.name.lastName].filter(Boolean).join(" ") || "—";
+}
 
 export default function ContactsPage() {
+  const [offset, setOffset] = useState(0);
+  const limite = 20;
+
+  const { data, loading, error, refetch } = useLeads({ limite, offset });
+  const contacts = data?.data ?? [];
+  const total = data?.total ?? 0;
+
+  const hasNext = contacts.length === limite;
+  const hasPrev = offset > 0;
+
   return (
     <Shell>
       {/* Page Header */}
@@ -95,14 +60,22 @@ export default function ContactsPage() {
                 Contatos
               </h1>
               <p className="font-mono text-sm text-steel">
-                TOTAL_REGISTROS: {contacts.length} | ATIVOS: {contacts.filter(c => c.status !== 'cold').length}
+                {loading
+                  ? "CARREGANDO..."
+                  : `TOTAL_REGISTROS: ${total} | OFFSET: ${offset}`}
               </p>
             </div>
 
-            <Button>
-              <Plus size={16} />
-              Novo Contato
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="secondary" size="sm" onClick={() => refetch()}>
+                <RefreshCw size={14} />
+                Atualizar
+              </Button>
+              <Button>
+                <Plus size={16} />
+                Novo Contato
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -121,15 +94,11 @@ export default function ContactsPage() {
           <div className="flex gap-2">
             <Button variant="secondary" size="sm">
               <Filter size={14} />
-              Status
+              Etapa
             </Button>
             <Button variant="secondary" size="sm">
               <Filter size={14} />
               Origem
-            </Button>
-            <Button variant="secondary" size="sm">
-              <Filter size={14} />
-              Especialidade
             </Button>
           </div>
         </div>
@@ -139,107 +108,121 @@ export default function ContactsPage() {
       <div className="p-6 lg:p-8">
         <Card>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Origem</TableHead>
-                  <TableHead>Interesse</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Último Contato</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {contacts.map((contact) => (
-                  <TableRow key={contact.id}>
-                    <TableCell className="font-mono text-xs">
-                      {contact.id}
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{contact.name}</p>
-                        <p className="text-sm text-steel">{contact.email}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge>{contact.origin}</Badge>
-                    </TableCell>
-                    <TableCell className="text-steel">
-                      {contact.specialty}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          contact.status === "hot"
-                            ? "warning"
-                            : contact.status === "warm"
-                            ? "info"
-                            : "default"
-                        }
-                      >
-                        {contact.status.toUpperCase()}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-mono text-xs text-steel">
-                      {contact.lastContact}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-1">
-                        <button
-                          className="p-2 hover:bg-paper transition-colors"
-                          aria-label="Ligar"
-                        >
-                          <Phone size={14} />
-                        </button>
-                        <button
-                          className="p-2 hover:bg-paper transition-colors"
-                          aria-label="Email"
-                        >
-                          <Mail size={14} />
-                        </button>
-                        <button
-                          className="p-2 hover:bg-paper transition-colors"
-                          aria-label="WhatsApp"
-                        >
-                          <MessageSquare size={14} />
-                        </button>
-                        <button
-                          className="p-2 hover:bg-paper transition-colors"
-                          aria-label="Agendar"
-                        >
-                          <Calendar size={14} />
-                        </button>
-                        <button
-                          className="p-2 hover:bg-paper transition-colors"
-                          aria-label="Mais opções"
-                        >
-                          <MoreVertical size={14} />
-                        </button>
-                      </div>
-                    </TableCell>
+            {loading ? (
+              <p className="text-sm text-steel py-12 text-center font-mono">
+                CARREGANDO CONTATOS...
+              </p>
+            ) : error ? (
+              <div className="py-12 text-center">
+                <p className="text-sm text-steel font-mono mb-4">
+                  ERRO AO CARREGAR CONTATOS
+                </p>
+                <Button variant="secondary" size="sm" onClick={() => refetch()}>
+                  Tentar Novamente
+                </Button>
+              </div>
+            ) : contacts.length === 0 ? (
+              <p className="text-sm text-steel py-12 text-center font-mono">
+                NENHUM CONTATO ENCONTRADO
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Contato</TableHead>
+                    <TableHead>Telefone</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Etapa</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {contacts.map((contact, idx) => (
+                    <TableRow key={contact.id || idx}>
+                      <TableCell>
+                        <p className="font-medium">{getLeadName(contact)}</p>
+                      </TableCell>
+                      <TableCell className="font-mono text-xs text-steel">
+                        {contact.phones?.primaryPhoneNumber || "—"}
+                      </TableCell>
+                      <TableCell className="text-sm text-steel">
+                        {contact.emails?.primaryEmail || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {contact.stage ? (
+                          <Badge variant="info">{contact.stage}</Badge>
+                        ) : (
+                          <span className="text-steel">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-1">
+                          <button
+                            className="p-2 hover:bg-paper transition-colors"
+                            aria-label="Ligar"
+                          >
+                            <Phone size={14} />
+                          </button>
+                          <button
+                            className="p-2 hover:bg-paper transition-colors"
+                            aria-label="Email"
+                          >
+                            <Mail size={14} />
+                          </button>
+                          <button
+                            className="p-2 hover:bg-paper transition-colors"
+                            aria-label="WhatsApp"
+                          >
+                            <MessageSquare size={14} />
+                          </button>
+                          <button
+                            className="p-2 hover:bg-paper transition-colors"
+                            aria-label="Agendar"
+                          >
+                            <Calendar size={14} />
+                          </button>
+                          <button
+                            className="p-2 hover:bg-paper transition-colors"
+                            aria-label="Mais opções"
+                          >
+                            <MoreVertical size={14} />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
 
         {/* Pagination */}
-        <div className="mt-4 flex items-center justify-between">
-          <span className="font-mono text-xs text-steel">
-            EXIBINDO 1-5 DE 5 REGISTROS
-          </span>
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm" disabled>
-              Anterior
-            </Button>
-            <Button variant="secondary" size="sm" disabled>
-              Próximo
-            </Button>
+        {!loading && contacts.length > 0 && (
+          <div className="mt-4 flex items-center justify-between">
+            <span className="font-mono text-xs text-steel">
+              EXIBINDO {offset + 1}-{offset + contacts.length} DE {total} REGISTROS
+            </span>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={!hasPrev}
+                onClick={() => setOffset(Math.max(0, offset - limite))}
+              >
+                Anterior
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={!hasNext}
+                onClick={() => setOffset(offset + limite)}
+              >
+                Próximo
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </Shell>
   );

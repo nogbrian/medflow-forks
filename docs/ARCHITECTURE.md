@@ -3,53 +3,85 @@
 ## System Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Coolify (PaaS)                              │
-│                     72.61.37.176 + Traefik                          │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐            │
-│  │  Twenty CRM  │   │   Chatwoot   │   │   Cal.com    │            │
-│  │  (Contacts   │   │  (Messaging  │   │ (Scheduling) │            │
-│  │   Pipeline)  │   │   WhatsApp)  │   │              │            │
-│  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘            │
-│         │                   │                   │                    │
-│         │    Webhooks       │    Webhooks        │   Webhooks        │
-│         ▼                   ▼                   ▼                    │
-│  ┌──────────────────────────────────────────────────────┐           │
-│  │              MedFlow Integration API                  │           │
-│  │           (FastAPI + PostgreSQL + Redis)               │           │
-│  │                                                       │           │
-│  │  /sync/webhooks/twenty   → sync contact to Chatwoot   │           │
-│  │  /sync/webhooks/chatwoot → sync contact to Twenty     │           │
-│  │  /sync/webhooks/calcom   → update Twenty + notify CW  │           │
-│  └──────────────────────────────────────────────────────┘           │
-│                                                                     │
-│  ┌──────────────┐                                                   │
-│  │ Evolution API│──── WhatsApp ────▶ Chatwoot Inbox                 │
-│  │  (WhatsApp)  │                                                   │
-│  └──────────────┘                                                   │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Coolify (PaaS)                                   │
+│                     72.61.37.176 + Traefik                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌────────────────────────────────────────────────────────────────────┐  │
+│  │  MedFlow Frontend Shell (Next.js)                                  │  │
+│  │  medflow.trafegoparaconsultorios.com.br                            │  │
+│  │                                                                    │  │
+│  │  ┌──────────┐  ┌───────────────────────────────────────────────┐  │  │
+│  │  │ Sidebar  │  │  Iframe Modules:                              │  │  │
+│  │  │          │  │                                               │  │  │
+│  │  │ Dashboard│  │  /crm     → crm.trafego...   (Twenty)        │  │  │
+│  │  │ CRM      │  │  /inbox   → inbox.trafego... (Chatwoot)      │  │  │
+│  │  │ Inbox    │  │  /agenda  → agenda.trafego...(Cal.com)       │  │  │
+│  │  │ Agenda   │  │  /creative→ studio.trafego...(Creative)      │  │  │
+│  │  │ Creative │  │                                               │  │  │
+│  │  └──────────┘  └───────────────────────────────────────────────┘  │  │
+│  └────────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐                │
+│  │  Twenty CRM  │   │   Chatwoot   │   │   Cal.com    │                │
+│  │  (Contacts   │   │  (Messaging  │   │ (Scheduling) │                │
+│  │   Pipeline)  │   │   WhatsApp)  │   │              │                │
+│  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘                │
+│         │                   │                   │                        │
+│         │    Webhooks       │    Webhooks       │   Webhooks             │
+│         ▼                   ▼                   ▼                        │
+│  ┌──────────────────────────────────────────────────────┐               │
+│  │              MedFlow Integration API                  │               │
+│  │           (FastAPI + PostgreSQL + Redis)               │               │
+│  │                                                       │               │
+│  │  /auth/login               → JWT token                │               │
+│  │  /sync/webhooks/twenty     → sync contact to Chatwoot │               │
+│  │  /sync/webhooks/chatwoot   → sync contact to Twenty   │               │
+│  │  /sync/webhooks/calcom     → update Twenty + notify   │               │
+│  └──────────────────────────────────────────────────────┘               │
+│                                                                          │
+│  ┌──────────────┐   ┌──────────────┐                                   │
+│  │Creative Studio│   │ Evolution API│── WhatsApp ──▶ Chatwoot           │
+│  │ (Gemini AI)  │   │  (WhatsApp)  │                                   │
+│  └──────────────┘   └──────────────┘                                   │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Components
 
+### MedFlow Frontend Shell (NEW)
+- **Role:** Unified navigation interface wrapping all modules
+- **URL:** `https://medflow.trafegoparaconsultorios.com.br`
+- **Stack:** Next.js 15 + React 19 + Tailwind CSS
+- **Auth:** JWT via Integration API, stored in localStorage
+- **Pattern:** Shell Container with iframe embedding
+- **Port:** 3000
+
+### Creative Studio (NEW)
+- **Role:** AI-powered creative/image generation for marketing
+- **URL:** `https://studio.trafegoparaconsultorios.com.br`
+- **Stack:** React 19 + Vite + Google Gemini API
+- **Auth:** Gemini API key injected at container runtime
+- **Port:** 3001
+- **Serving:** nginx (static SPA)
+
 ### Twenty CRM
 - **Role:** Source of truth for contacts and sales pipeline
-- **Container:** `twenty-m8w8gso08k44wc0cs4oswosg`
+- **URL:** `https://crm.trafegoparaconsultorios.com.br`
 - **Stack:** Node.js + PostgreSQL + Redis
 - **Key Objects:** Person (contacts), Opportunity (pipeline stages)
 
 ### Chatwoot
 - **Role:** Customer messaging hub (WhatsApp, web chat)
-- **Container:** `chatwoot-d8gc84okgccw84g444wgswko`
+- **URL:** `https://inbox.trafegoparaconsultorios.com.br`
 - **Stack:** Rails + PostgreSQL (pgvector) + Redis + Sidekiq
 - **Key Objects:** Contact, Conversation, Message
 
 ### Cal.com
 - **Role:** Appointment scheduling
-- **Container:** `calcom-bk0k00wkoog8ck48c4k8k4gc`
+- **URL:** `https://agenda.trafegoparaconsultorios.com.br`
 - **Stack:** Next.js + PostgreSQL
 - **Key Objects:** Booking, EventType
 
@@ -59,14 +91,32 @@
 - **Connection:** Directly integrated with Chatwoot inbox
 
 ### MedFlow Integration API
-- **Role:** Orchestration layer connecting all services
+- **Role:** Orchestration layer + auth + AI agents
+- **URL:** `https://api.trafegoparaconsultorios.com.br`
 - **Stack:** FastAPI (Python 3.12) + PostgreSQL + Redis
 - **Key Modules:**
-  - `services/sync_service.py` - Cross-service sync logic
+  - `core/auth.py` - JWT authentication + RBAC
+  - `api/routes/auth.py` - Login/logout endpoints
+  - `services/sync_service.py` - Cross-service sync
   - `api/routes/sync.py` - Webhook endpoints
-  - `core/config.py` - Configuration with security validation
+
+## Docker Compose Services (medflow-forks)
+
+```yaml
+services:
+  integration   # FastAPI API    → api.trafegoparaconsultorios.com.br    :8000
+  web           # Next.js Shell  → medflow.trafegoparaconsultorios.com.br :3000
+  creative-studio # Vite + nginx → studio.trafegoparaconsultorios.com.br  :3001
+```
 
 ## Data Flow
+
+### User Authentication
+```
+Browser → /login (Shell) → POST /api/auth/login → Integration API
+  → Verify bcrypt password → Generate JWT (24h)
+  → Store in localStorage → Render Shell with modules
+```
 
 ### Contact Created in Twenty
 ```
@@ -101,20 +151,29 @@ Cal.com → webhook → POST /sync/webhooks/calcom
 ```
 agencies
   ├── clinics (multi-tenant)
-  └── users (superuser, admin, agent roles)
+  └── users (superuser, agency_staff, clinic_owner, clinic_staff)
 ```
 
 Managed by Alembic migrations in `/integration/alembic/`.
 
 ## Security
 
+- **JWT Auth:** HS256 tokens, 24h expiration, bcrypt password hashing
+- **RBAC:** 4 roles with multi-tenant clinic isolation
 - **Webhook Verification:** HMAC-SHA256 signatures on all webhook endpoints
-- **JWT Auth:** HS256 tokens for API authentication
-- **Environment Isolation:** Secrets validated at startup, random dev secrets generated in development
+- **Iframe Security:** CSP `frame-ancestors` restricts embedding to shell domain
+- **Environment Isolation:** Secrets validated at startup
 - **CORS:** Configurable origins via `CORS_ORIGINS_RAW`
 
 ## Networking
 
-All services run in Docker on the same host, connected via the `coolify` Docker network. Traefik handles TLS termination and routing via labels.
+All services run in Docker on the same host, connected via the `coolify` Docker network. Traefik handles TLS termination and routing via labels. Internal communication uses Docker DNS.
 
-Internal communication uses Docker DNS: `service-uuid.72.61.37.176.sslip.io` (HTTP).
+## Related Docs
+
+- [Auth Strategy](./AUTH_STRATEGY.md)
+- [Navigation Architecture](./NAVIGATION_ARCHITECTURE.md)
+- [Design System](./DESIGN_SYSTEM.md)
+- [Iframe Configuration](./IFRAME_CONFIG.md)
+- [Creative Studio Analysis](./CREATIVE_STUDIO_ANALYSIS.md)
+- [API Endpoints](./ENDPOINTS.md)

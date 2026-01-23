@@ -271,6 +271,16 @@ export const ChatInterface: React.FC = () => {
           }];
         });
 
+        // Notify parent shell about generated creatives
+        if (generatedImages.length > 0 && window.parent !== window) {
+          window.parent.postMessage({
+            type: 'creative:generated',
+            images: generatedImages,
+            prompt: finalResponseText || '',
+            count: generatedImages.length,
+          }, '*');
+        }
+
         // --- 5. CAROUSEL VERIFICATION LOGIC ---
         // If we generated multiple images, we force the model to verify them.
         if (generatedImages.length > 1 && loopCount < MAX_LOOPS - 1) {

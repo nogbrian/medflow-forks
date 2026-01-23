@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
  */
 
 export default function CRMPage() {
-  const twentyUrl = process.env.NEXT_PUBLIC_TWENTY_URL || "http://localhost:3001";
+  const twentyUrl = process.env.NEXT_PUBLIC_TWENTY_URL || "http://localhost:3004";
 
   return (
     <Shell>

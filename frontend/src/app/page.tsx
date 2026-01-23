@@ -9,6 +9,7 @@ import {
   BarChart3,
   Target,
   Clock,
+  RefreshCw,
 } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -23,29 +24,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDashboardMetrics, useRecentLeads, useUpcomingBookings } from "@/hooks";
+import { formatDate, formatCurrency } from "@/lib/utils";
 
 /**
  * Dashboard Principal
  *
  * Visão geral do sistema com métricas e atividades recentes.
- * Estilo: Relatório técnico / Bloomberg Terminal.
+ * Dados vêm do backend via API proxy routes.
+ * Fallback para estados vazios quando API está indisponível.
  */
 
-const recentLeads = [
-  { id: "L-001", name: "Maria Silva", origin: "Instagram", status: "hot", date: "21/01/2026" },
-  { id: "L-002", name: "João Santos", origin: "WhatsApp", status: "warm", date: "21/01/2026" },
-  { id: "L-003", name: "Ana Costa", origin: "Google Ads", status: "cold", date: "20/01/2026" },
-  { id: "L-004", name: "Pedro Lima", origin: "Indicação", status: "hot", date: "20/01/2026" },
-  { id: "L-005", name: "Clara Souza", origin: "Site", status: "warm", date: "19/01/2026" },
-];
-
-const upcomingAppointments = [
-  { time: "09:00", patient: "Maria Silva", type: "Consulta", doctor: "Dr. Roberto" },
-  { time: "10:30", patient: "João Santos", type: "Retorno", doctor: "Dra. Ana" },
-  { time: "14:00", patient: "Pedro Lima", type: "Avaliação", doctor: "Dr. Roberto" },
-];
+function getLeadName(lead: { name?: { firstName?: string; lastName?: string } }): string {
+  if (!lead.name) return "—";
+  return [lead.name.firstName, lead.name.lastName].filter(Boolean).join(" ") || "—";
+}
 
 export default function DashboardPage() {
+  const { data: metrics, loading: metricsLoading, refetch: refetchMetrics } = useDashboardMetrics();
+  const { data: leadsData, loading: leadsLoading } = useRecentLeads();
+  const { data: bookingsData, loading: bookingsLoading } = useUpcomingBookings();
+
+  const leads = leadsData?.data ?? [];
+  const bookings = bookingsData?.data ?? [];
+  const now = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+
   return (
     <Shell>
       {/* Page Header */}
@@ -62,13 +65,18 @@ export default function DashboardPage() {
               </Badge>
             </div>
             <p className="font-mono text-sm text-steel">
-              ÚLTIMA_ATUALIZAÇÃO: 21/01/2026 08:30:00
+              ÚLTIMA_ATUALIZAÇÃO: {now}
             </p>
           </div>
 
           <div className="flex gap-3">
-            <Button variant="secondary" size="sm">
-              Exportar Relatório
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => refetchMetrics()}
+            >
+              <RefreshCw size={14} />
+              Atualizar
             </Button>
             <Button size="sm">
               Nova Campanha <ArrowRight size={14} />
@@ -82,26 +90,22 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-graphite border border-graphite">
           <Metric
             label="Leads (Mês)"
-            value="+420"
-            change={{ value: 12, trend: "up" }}
+            value={metricsLoading ? "—" : `+${metrics?.leads_total ?? 0}`}
             icon={<Users size={24} />}
           />
           <Metric
             label="Consultas Agendadas"
-            value="89"
-            change={{ value: 8, trend: "up" }}
+            value={metricsLoading ? "—" : String(metrics?.bookings_upcoming ?? 0)}
             icon={<Calendar size={24} />}
           />
           <Metric
             label="Conversas Ativas"
-            value="34"
-            change={{ value: -5, trend: "down" }}
+            value={metricsLoading ? "—" : String(metrics?.conversations_active ?? 0)}
             icon={<MessageSquare size={24} />}
           />
           <Metric
             label="Taxa de Conversão"
-            value="21.2%"
-            change={{ value: 3, trend: "up" }}
+            value={metricsLoading ? "—" : `${metrics?.conversion_rate ?? 0}%`}
             icon={<TrendingUp size={24} />}
           />
         </div>
@@ -122,44 +126,48 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Origem</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Data</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentLeads.map((lead) => (
-                    <TableRow key={lead.id}>
-                      <TableCell className="font-mono text-xs">
-                        {lead.id}
-                      </TableCell>
-                      <TableCell className="font-medium">{lead.name}</TableCell>
-                      <TableCell className="text-steel">{lead.origin}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            lead.status === "hot"
-                              ? "warning"
-                              : lead.status === "warm"
-                              ? "info"
-                              : "default"
-                          }
-                        >
-                          {lead.status.toUpperCase()}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-mono text-xs text-steel">
-                        {lead.date}
-                      </TableCell>
+              {leadsLoading ? (
+                <p className="text-sm text-steel py-8 text-center font-mono">
+                  CARREGANDO...
+                </p>
+              ) : leads.length === 0 ? (
+                <p className="text-sm text-steel py-8 text-center font-mono">
+                  NENHUM LEAD ENCONTRADO
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Telefone</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Etapa</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {leads.slice(0, 8).map((lead, idx) => (
+                      <TableRow key={lead.id || idx}>
+                        <TableCell className="font-medium">
+                          {getLeadName(lead)}
+                        </TableCell>
+                        <TableCell className="font-mono text-xs text-steel">
+                          {lead.phones?.primaryPhoneNumber || "—"}
+                        </TableCell>
+                        <TableCell className="text-steel text-sm">
+                          {lead.emails?.primaryEmail || "—"}
+                        </TableCell>
+                        <TableCell>
+                          {lead.stage ? (
+                            <Badge variant="info">{lead.stage}</Badge>
+                          ) : (
+                            <span className="text-steel">—</span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -172,34 +180,54 @@ export default function DashboardPage() {
                 <CardTitle>Agenda Hoje</CardTitle>
                 <Badge variant="active">
                   <Clock size={12} />
-                  3 Consultas
+                  {bookings.length} Consulta{bookings.length !== 1 ? "s" : ""}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {upcomingAppointments.map((apt, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-4 pb-4 border-b border-graphite last:border-0 last:pb-0"
-                  >
-                    <div className="bg-ink text-white px-3 py-2 text-center min-w-[60px]">
-                      <span className="font-mono text-sm font-bold">
-                        {apt.time}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">{apt.patient}</p>
-                      <p className="text-sm text-steel">
-                        {apt.type} • {apt.doctor}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {bookingsLoading ? (
+                <p className="text-sm text-steel py-4 text-center font-mono">
+                  CARREGANDO...
+                </p>
+              ) : bookings.length === 0 ? (
+                <p className="text-sm text-steel py-4 text-center font-mono">
+                  NENHUMA CONSULTA HOJE
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {bookings.slice(0, 5).map((booking, idx) => {
+                    const time = booking.inicio
+                      ? new Date(booking.inicio).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "—";
+                    const attendee = booking.attendees?.[0]?.nome || booking.titulo || "—";
 
-              <Button variant="secondary" className="w-full mt-6">
-                Ver Agenda Completa
+                    return (
+                      <div
+                        key={booking.uid || idx}
+                        className="flex items-start gap-4 pb-4 border-b border-graphite last:border-0 last:pb-0"
+                      >
+                        <div className="bg-ink text-white px-3 py-2 text-center min-w-[60px]">
+                          <span className="font-mono text-sm font-bold">
+                            {time}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">{attendee}</p>
+                          <p className="text-sm text-steel">
+                            {booking.titulo || "Consulta"} • {booking.status || "CONFIRMED"}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <Button variant="secondary" className="w-full mt-6" asChild>
+                <a href="/agenda">Ver Agenda Completa</a>
               </Button>
             </CardContent>
           </Card>
@@ -211,13 +239,15 @@ export default function DashboardPage() {
                 <BarChart3 size={24} className="text-accent-orange" />
                 <div>
                   <p className="font-mono text-[10px] uppercase text-white/60">
-                    CPA Atual
+                    Conversão
                   </p>
-                  <p className="text-3xl font-bold tabular-nums">R$ 12,40</p>
+                  <p className="text-3xl font-bold tabular-nums">
+                    {metricsLoading ? "—" : `${metrics?.conversion_rate ?? 0}%`}
+                  </p>
                 </div>
               </div>
               <p className="text-sm text-white/60">
-                Custo por aquisição otimizado nos últimos 30 dias.
+                Taxa de conversão leads → consultas agendadas.
               </p>
             </CardContent>
           </Card>

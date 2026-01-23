@@ -5,25 +5,17 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
-  Building2,
   Kanban,
   Calendar,
-  Clock,
-  ListChecks,
   MessageSquare,
-  Contact,
-  Palette,
-  Bot,
-  PenLine,
   Image,
-  Workflow,
-  ClipboardList,
-  Settings,
   Hospital,
   Plug,
   X,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth/auth-provider";
 
 /**
  * Sidebar Industrial
@@ -58,39 +50,26 @@ const navigation: NavSection[] = [
   {
     title: "CRM",
     items: [
+      { href: "/crm", label: "CRM", icon: Kanban },
       { href: "/crm/contacts", label: "Contatos", icon: Users },
-      { href: "/crm/companies", label: "Empresas", icon: Building2 },
-      { href: "/crm/pipeline", label: "Pipeline", icon: Kanban },
     ],
   },
   {
     title: "Agenda",
     items: [
-      { href: "/agenda/bookings", label: "Agendamentos", icon: Calendar },
-      { href: "/agenda/availability", label: "Disponibilidade", icon: Clock },
-      { href: "/agenda/event-types", label: "Tipos de Evento", icon: ListChecks },
+      { href: "/agenda", label: "Agendamentos", icon: Calendar },
     ],
   },
   {
     title: "Inbox",
     items: [
-      { href: "/inbox/conversations", label: "Conversas", icon: MessageSquare },
-      { href: "/inbox/contacts", label: "Contatos", icon: Contact },
+      { href: "/inbox", label: "Conversas", icon: MessageSquare },
     ],
   },
   {
     title: "Creative Lab",
     items: [
-      { href: "/creative/chat", label: "Assistente", icon: Bot },
-      { href: "/creative/copy", label: "Copywriter", icon: PenLine },
-      { href: "/creative/image", label: "Designer", icon: Image },
-    ],
-  },
-  {
-    title: "Agentes IA",
-    items: [
-      { href: "/agents/workflows", label: "Workflows", icon: Workflow },
-      { href: "/agents/plans", label: "Planos", icon: ClipboardList },
+      { href: "/creative", label: "Creative Studio", icon: Image },
     ],
   },
   {
@@ -105,6 +84,7 @@ const navigation: NavSection[] = [
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   return (
     <>
@@ -180,22 +160,28 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-graphite bg-white">
-          <div className="flex justify-between items-end">
-            <div>
-              <span className="font-mono text-[10px] text-steel uppercase block mb-1">
-                Sistema
-              </span>
-              <span className="font-mono text-xs font-bold">MF-2026</span>
+        {/* Footer - User & Logout */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-graphite bg-white">
+          {user && (
+            <div className="flex items-center justify-between">
+              <div className="min-w-0">
+                <span className="block text-xs font-medium truncate">
+                  {user.name}
+                </span>
+                <span className="block font-mono text-[10px] text-steel truncate">
+                  {user.email}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                className="p-2 text-steel hover:text-red-600 transition-colors flex-shrink-0"
+                aria-label="Sair"
+                title="Sair"
+              >
+                <LogOut size={16} />
+              </button>
             </div>
-            <div className="text-right">
-              <span className="font-mono text-[10px] text-steel uppercase block mb-1">
-                Versão
-              </span>
-              <span className="font-mono text-xs">1.0.0</span>
-            </div>
-          </div>
+          )}
         </div>
       </aside>
     </>
