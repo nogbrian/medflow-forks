@@ -137,28 +137,43 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               {/* Section Items */}
               <ul>
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href ||
-                    (item.href !== "/" && pathname.startsWith(item.href));
+                  const isExternal = item.href.startsWith("http");
+                  const isActive = !isExternal && (
+                    pathname === item.href ||
+                    (item.href !== "/" && pathname.startsWith(item.href))
+                  );
                   const Icon = item.icon;
+                  const linkClass = cn(
+                    "flex items-center gap-3 px-6 py-2.5",
+                    "text-sm font-medium",
+                    "border-l-2 border-transparent",
+                    "transition-colors duration-100",
+                    isActive
+                      ? "bg-white text-ink border-l-accent-orange"
+                      : "hover:bg-white hover:border-l-steel"
+                  );
 
                   return (
                     <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        onClick={onClose}
-                        className={cn(
-                          "flex items-center gap-3 px-6 py-2.5",
-                          "text-sm font-medium",
-                          "border-l-2 border-transparent",
-                          "transition-colors duration-100",
-                          isActive
-                            ? "bg-white text-ink border-l-accent-orange"
-                            : "hover:bg-white hover:border-l-steel"
-                        )}
-                      >
-                        <Icon size={16} className={isActive ? "text-accent-orange" : ""} />
-                        {item.label}
-                      </Link>
+                      {isExternal ? (
+                        <a
+                          href={item.href}
+                          onClick={onClose}
+                          className={linkClass}
+                        >
+                          <Icon size={16} />
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link
+                          href={item.href}
+                          onClick={onClose}
+                          className={linkClass}
+                        >
+                          <Icon size={16} className={isActive ? "text-accent-orange" : ""} />
+                          {item.label}
+                        </Link>
+                      )}
                     </li>
                   );
                 })}

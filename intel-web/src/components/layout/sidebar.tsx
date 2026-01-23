@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -12,6 +12,7 @@ import {
   PenLine,
   Palette,
   LogOut,
+  ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -27,12 +28,11 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
 
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/login');
-    router.refresh();
+  const handleLogout = () => {
+    // Clear the shared auth cookie and redirect to MedFlow login
+    document.cookie = 'medflow_token=; path=/; domain=.trafegoparaconsultorios.com.br; max-age=0';
+    window.location.href = 'https://medflow.trafegoparaconsultorios.com.br/login';
   };
 
   return (
@@ -66,6 +66,13 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t p-4 space-y-3">
+        <a
+          href="https://medflow.trafegoparaconsultorios.com.br"
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar ao MedFlow
+        </a>
         <Button
           variant="ghost"
           className="w-full justify-start text-muted-foreground hover:text-foreground"
@@ -74,11 +81,6 @@ export function Sidebar() {
           <LogOut className="h-4 w-4 mr-2" />
           Sair
         </Button>
-        <div className="rounded-lg bg-muted p-3">
-          <p className="text-xs text-muted-foreground">
-            Powered by Python + AI
-          </p>
-        </div>
       </div>
     </div>
   );
