@@ -57,9 +57,9 @@ MODEL_CONTEXT_LIMITS: dict[str, int] = {
 # Provider → tier → model mapping
 PROVIDER_MODELS: dict[str, dict[ModelTier, str]] = {
     "anthropic": {
-        "fast": "claude-haiku-4-20250514",
-        "smart": "claude-sonnet-4-5-20250514",
-        "creative": "claude-sonnet-4-5-20250514",
+        "fast": "claude-3-5-haiku-20241022",
+        "smart": "claude-3-5-sonnet-20241022",
+        "creative": "claude-3-5-sonnet-20241022",
     },
     "openai": {
         "fast": "gpt-4o-mini",
@@ -802,11 +802,12 @@ class LLMRouter:
         input_tokens = 0
         output_tokens = 0
 
-        async for chunk in client.aio.models.generate_content_stream(
+        stream_response = await client.aio.models.generate_content_stream(
             model=model,
             contents=contents,
             config=config,
-        ):
+        )
+        async for chunk in stream_response:
             if chunk.candidates:
                 for part in chunk.candidates[0].content.parts:
                     if part.text:
