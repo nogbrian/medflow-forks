@@ -9,9 +9,47 @@ from sqlalchemy import select
 
 from core.auth import CurrentUser, DBSession, require_clinic_access
 from core.models import Clinic
+from core.agentic.config import AgenticConfig
+from core.agentic.loop import AgenticLoop
+from core.llm_router import LLMRouter
 
 router = APIRouter(prefix="/agents")
 logger = logging.getLogger(__name__)
+
+# System prompts for each agent type
+AGENT_PROMPTS: dict[str, str] = {
+    "sdr": (
+        "Você é um SDR (Sales Development Representative) especializado em clínicas médicas brasileiras. "
+        "Sua função é qualificar leads, responder sobre serviços, e agendar consultas. "
+        "Seja cordial, profissional, e nunca prometa resultados médicos (CFM). "
+        "Responda em português brasileiro."
+    ),
+    "support": (
+        "Você é um atendente de suporte para pacientes de clínicas médicas. "
+        "Ajude com informações sobre consultas, preparativos para exames, "
+        "e dúvidas administrativas. Seja empático e claro. Português brasileiro."
+    ),
+    "scheduler": (
+        "Você é um assistente de agendamento para clínicas médicas. "
+        "Verifique disponibilidade, crie agendamentos, e confirme com o paciente. "
+        "Seja eficiente e claro nas opções de horário. Português brasileiro."
+    ),
+    "qualifier": (
+        "Você é um especialista em qualificação de leads para clínicas médicas. "
+        "Analise o perfil do lead, identifique necessidades, e classifique como quente, morno ou frio. "
+        "Português brasileiro."
+    ),
+    "follow_up": (
+        "Você é um especialista em follow-up e reengajamento de leads para clínicas médicas. "
+        "Crie mensagens personalizadas para reconectar com leads que não responderam. "
+        "Português brasileiro."
+    ),
+    "general": (
+        "Você é o MedFlow, assistente de marketing médico para consultórios brasileiros. "
+        "Ajude com agendamentos, dúvidas sobre serviços, e atendimento ao paciente. "
+        "Sempre responda em português brasileiro. Seja profissional e empático."
+    ),
+}
 
 
 class GoalRequest(BaseModel):
@@ -388,91 +426,54 @@ async def _execute_agent(
     contact_data: dict[str, Any] | None,
     db: DBSession,
 ) -> str:
-    """Execute the appropriate agent and return response."""
-    from agents.coordinator import AgentType
+    """Execute the appropriate agent via the AgenticLoop."""
+    # Resolve agent type string
+    agent_key = str(agent_type).lower().replace("agenttype.", "")
+    system_prompt = AGENT_PROMPTS.get(agent_key, AGENT_PROMPTS["general"])
 
-    # Map agent type to actual agent execution
-    agent_responses = {
-        AgentType.SDR: _run_sdr_agent,
-        AgentType.SUPPORT: _run_support_agent,
-        AgentType.SCHEDULER: _run_scheduler_agent,
-        AgentType.QUALIFIER: _run_qualifier_agent,
-        AgentType.FOLLOW_UP: _run_follow_up_agent,
-    }
+    # Add contact context to prompt if available
+    if contact_data:
+        system_prompt += f"\n\nContexto do contato: {contact_data}"
 
-    handler = agent_responses.get(agent_type, _run_default_agent)
-    return await handler(message, clinic_id, contact_data, db)
+    # Get tools for this agent type
+    tools = _get_tools_for_agent_type(agent_key)
+
+    config = AgenticConfig(
+        max_turns=5,
+        timeout_seconds=60,
+        max_cost_usd=0.20,
+        tier="smart",
+        stream=False,
+    )
+
+    llm = LLMRouter()
+    loop = AgenticLoop(
+        system_prompt=system_prompt,
+        tools=tools,
+        config=config,
+        llm=llm,
+    )
+
+    result = await loop.run(message)
+    return result.final_response or "Desculpe, não consegui gerar uma resposta."
 
 
-async def _run_sdr_agent(
-    message: str,
-    clinic_id: str | None,
-    contact_data: dict[str, Any] | None,
-    db: DBSession,
-) -> str:
-    """Run SDR agent for sales inquiries."""
+def _get_tools_for_agent_type(agent_key: str) -> dict[str, Any]:
+    """Get tools for a given agent type from the registry."""
     try:
-        from agents.atendente_medicos import create_medical_receptionist
+        from core.tools.registry import get_global_registry
+        registry = get_global_registry()
 
-        agent = create_medical_receptionist()
-        # In a real implementation, we'd run the agent
-        # response = await agent.run(message, context=...)
-        return f"Olá! Terei prazer em ajudá-lo. {message[:20]}..."
-    except ImportError:
-        return "Olá! Como posso ajudá-lo hoje? Gostaria de saber mais sobre nossos serviços?"
+        category_map = {
+            "sdr": ["crm", "communication", "calendar"],
+            "support": ["communication", "calendar"],
+            "scheduler": ["calendar", "communication"],
+            "qualifier": ["crm"],
+            "follow_up": ["communication"],
+            "general": None,
+        }
 
-
-async def _run_support_agent(
-    message: str,
-    clinic_id: str | None,
-    contact_data: dict[str, Any] | None,
-    db: DBSession,
-) -> str:
-    """Run support agent for existing patients."""
-    return "Obrigado por entrar em contato! Vou verificar suas informações e ajudá-lo."
-
-
-async def _run_scheduler_agent(
-    message: str,
-    clinic_id: str | None,
-    contact_data: dict[str, Any] | None,
-    db: DBSession,
-) -> str:
-    """Run scheduler agent for appointment handling."""
-    try:
-        from agents.appointment_scheduler import create_appointment_scheduler
-
-        agent = create_appointment_scheduler()
-        return "Claro! Vou verificar nossa disponibilidade. Qual dia e horário seria melhor para você?"
-    except ImportError:
-        return "Entendi que você gostaria de agendar uma consulta. Qual sua preferência de data e horário?"
-
-
-async def _run_qualifier_agent(
-    message: str,
-    clinic_id: str | None,
-    contact_data: dict[str, Any] | None,
-    db: DBSession,
-) -> str:
-    """Run lead qualifier agent."""
-    return "Obrigado pelas informações! Vou analisar seu perfil."
-
-
-async def _run_follow_up_agent(
-    message: str,
-    clinic_id: str | None,
-    contact_data: dict[str, Any] | None,
-    db: DBSession,
-) -> str:
-    """Run follow-up agent for re-engagement."""
-    return "Olá! Notamos que você demonstrou interesse anteriormente. Ainda posso ajudar?"
-
-
-async def _run_default_agent(
-    message: str,
-    clinic_id: str | None,
-    contact_data: dict[str, Any] | None,
-    db: DBSession,
-) -> str:
-    """Default fallback agent."""
-    return "Olá! Como posso ajudá-lo hoje?"
+        categories = category_map.get(agent_key)
+        return registry.get_for_loop(categories=categories)
+    except Exception:
+        return {}

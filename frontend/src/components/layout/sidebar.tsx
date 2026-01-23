@@ -14,6 +14,7 @@ import {
   X,
   LogOut,
   Radar,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -71,6 +72,12 @@ const navigation: NavSection[] = [
     title: "Creative Lab",
     items: [
       { href: "/creative", label: "Creative Studio", icon: Image },
+    ],
+  },
+  {
+    title: "Agentes",
+    items: [
+      { href: "/agents", label: "Playground", icon: Bot },
     ],
   },
   {

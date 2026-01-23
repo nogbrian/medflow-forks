@@ -50,6 +50,13 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting MedFlow Integration API (simplified)")
+    # Register tools for the agentic loop
+    try:
+        from core.tools.builtins import register_all_tools
+        register_all_tools()
+        logger.info("Tool registry initialized")
+    except Exception as e:
+        logger.warning(f"Tool registry init failed (non-fatal): {e}")
     yield
     logger.info("Shutting down")
 
