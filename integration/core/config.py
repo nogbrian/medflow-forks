@@ -47,13 +47,17 @@ class Settings(BaseSettings):
     # Webhooks - NO DEFAULTS, validated below
     webhook_secret: str = ""
 
-    # External Services - use sslip.io URLs as defaults for Coolify deployment
-    twenty_api_url: str = "http://twenty-m8w8gso08k44wc0cs4oswosg.72.61.37.176.sslip.io"
+    # External Services
+    twenty_api_url: str = "https://crm.trafegoparaconsultorios.com.br"
     twenty_api_key: str | None = None
-    calcom_api_url: str = "http://calcom-bk0k00wkoog8ck48c4k8k4gc.72.61.37.176.sslip.io"
+    calcom_api_url: str = "https://agenda.trafegoparaconsultorios.com.br"
     calcom_api_key: str | None = None
-    chatwoot_api_url: str = "http://chatwoot-d8gc84okgccw84g444wgswko.72.61.37.176.sslip.io"
+    calcom_event_type_id_default: int = 1
+    chatwoot_api_url: str = "https://inbox.trafegoparaconsultorios.com.br"
     chatwoot_api_key: str | None = None
+    chatwoot_account_id: str = "1"
+    chatwoot_inbox_id: str = "1"
+    chatwoot_human_team_id: str = "1"
 
     # LLM Configuration
     llm_provider: str = "anthropic"  # anthropic, openai, google, xai
@@ -69,6 +73,7 @@ class Settings(BaseSettings):
     # WhatsApp (Evolution API)
     evolution_api_url: str | None = None
     evolution_api_key: str | None = None
+    evolution_instance_agencia: str = "agencia"  # WhatsApp instance name for agency
 
     # Image Generation
     replicate_api_key: str | None = None

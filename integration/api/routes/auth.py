@@ -3,7 +3,9 @@
 import logging
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Cookie, HTTPException, Request, status
+from fastapi.responses import HTMLResponse
+from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 
@@ -14,9 +16,11 @@ from core.auth import (
     get_password_hash,
     verify_password,
 )
+from core.config import get_settings
 from core.models import User
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 router = APIRouter(prefix="/auth")
 
 
@@ -146,3 +150,61 @@ async def change_password(
     await db.flush()
 
     return {"message": "Password changed successfully"}
+
+
+LOGIN_URL = "https://medflow.trafegoparaconsultorios.com.br/login"
+
+REDIRECT_HTML = """<!DOCTYPE html>
+<html><head><meta http-equiv="refresh" content="0;url={url}"></head>
+<body>Redirecting to <a href="{url}">login</a>...</body></html>
+"""
+
+
+@router.get("/verify")
+async def verify_auth(request: Request):
+    """Verify JWT from cookie. Used by Traefik forwardAuth middleware.
+
+    Returns 200 if valid token found in cookie, 401 otherwise.
+    On 401, returns HTML that redirects to the login page.
+    """
+    token = request.cookies.get("medflow_token")
+    if not token:
+        # Check Authorization header as fallback
+        auth_header = request.headers.get("authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+
+    if not token:
+        original_url = _build_original_url(request)
+        redirect_url = f"{LOGIN_URL}?redirect={original_url}"
+        return HTMLResponse(
+            content=REDIRECT_HTML.format(url=redirect_url),
+            status_code=401,
+        )
+
+    try:
+        payload = jwt.decode(
+            token,
+            settings.jwt_secret,
+            algorithms=[settings.jwt_algorithm],
+        )
+        if not payload.get("sub"):
+            raise JWTError("Missing sub claim")
+        return {"status": "ok", "sub": payload["sub"]}
+    except JWTError:
+        original_url = _build_original_url(request)
+        redirect_url = f"{LOGIN_URL}?redirect={original_url}"
+        return HTMLResponse(
+            content=REDIRECT_HTML.format(url=redirect_url),
+            status_code=401,
+        )
+
+
+def _build_original_url(request: Request) -> str:
+    """Reconstruct the original URL from Traefik forwarded headers."""
+    proto = request.headers.get("x-forwarded-proto", "https")
+    host = request.headers.get("x-forwarded-host", "")
+    uri = request.headers.get("x-forwarded-uri", "/")
+    if host:
+        return f"{proto}://{host}{uri}"
+    return "/"

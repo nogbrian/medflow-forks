@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from typing import Callable
 from uuid import uuid4
 
-from fastapi import FastAPI, Request, Response
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from passlib.context import CryptContext
@@ -63,7 +63,7 @@ app = FastAPI(
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -89,11 +89,17 @@ async def root():
     }
 
 
+async def verify_admin_secret(x_admin_secret: str = Header(...)):
+    """Require X-Admin-Secret header matching WEBHOOK_SECRET for admin endpoints."""
+    if x_admin_secret != settings.webhook_secret:
+        raise HTTPException(status_code=403, detail="Invalid admin secret")
+
+
 class SeedRequest(BaseModel):
     password: str = "tpc2026#"
 
 
-@app.post("/api/admin/seed")
+@app.post("/api/admin/seed", dependencies=[Depends(verify_admin_secret)])
 async def seed_database(data: SeedRequest):
     """Seed the database with initial data."""
     try:
@@ -182,7 +188,7 @@ async def seed_database(data: SeedRequest):
         return {"status": "error", "message": str(e)}
 
 
-@app.get("/api/admin/db-status")
+@app.get("/api/admin/db-status", dependencies=[Depends(verify_admin_secret)])
 async def db_status():
     """Check database status."""
     try:
@@ -221,7 +227,7 @@ async def db_status():
         return {"status": "error", "message": str(e)}
 
 
-@app.post("/api/admin/run-migrations")
+@app.post("/api/admin/run-migrations", dependencies=[Depends(verify_admin_secret)])
 async def run_migrations():
     """Run alembic migrations."""
     import subprocess
@@ -242,7 +248,7 @@ async def run_migrations():
         return {"status": "error", "message": str(e)}
 
 
-@app.post("/api/admin/reset-db")
+@app.post("/api/admin/reset-db", dependencies=[Depends(verify_admin_secret)])
 async def reset_db():
     """Reset database - drop all tables, types, and reset alembic version."""
     try:
@@ -300,3 +306,67 @@ try:
     logger.info("Sync routes loaded")
 except Exception as e:
     logger.error(f"Failed to load sync routes: {e}")
+
+# Import creative lab routes
+try:
+    from api.routes.creative_lab import router as creative_lab_router
+    app.include_router(creative_lab_router, prefix="/api", tags=["Creative Lab"])
+    logger.info("Creative Lab routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load creative lab routes: {e}")
+
+# Import chat routes (SSE streaming + sync)
+try:
+    from api.routes.chat import router as chat_router
+    app.include_router(chat_router, prefix="/api", tags=["Chat"])
+    logger.info("Chat routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load chat routes: {e}")
+
+# Import agents routes
+try:
+    from api.routes.agents import router as agents_router
+    app.include_router(agents_router, prefix="/api", tags=["Agents"])
+    logger.info("Agents routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load agents routes: {e}")
+
+# Import webhook receivers (Evolution API / WhatsApp)
+try:
+    from webhooks.router import router as webhooks_router
+    app.include_router(webhooks_router, tags=["Webhooks"])
+    logger.info("Webhook routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load webhook routes: {e}")
+
+# Import leads routes (proxy to Twenty CRM)
+try:
+    from api.routes.leads import router as leads_router
+    app.include_router(leads_router, prefix="/api", tags=["Leads"])
+    logger.info("Leads routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load leads routes: {e}")
+
+# Import bookings routes (proxy to Cal.com)
+try:
+    from api.routes.bookings import router as bookings_router
+    app.include_router(bookings_router, prefix="/api", tags=["Bookings"])
+    logger.info("Bookings routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load bookings routes: {e}")
+
+# Import conversations routes (proxy to Chatwoot)
+try:
+    from api.routes.conversations import router as conversations_router
+    app.include_router(conversations_router, prefix="/api", tags=["Conversations"])
+    logger.info("Conversations routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load conversations routes: {e}")
+
+# Import dashboard routes (aggregated metrics)
+try:
+    from api.routes.dashboard import router as dashboard_router
+    app.include_router(dashboard_router, prefix="/api", tags=["Dashboard"])
+    logger.info("Dashboard routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load dashboard routes: {e}")

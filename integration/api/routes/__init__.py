@@ -1,5 +1,5 @@
-"""API routes."""
+"""API routes package.
 
-from . import auth, clinics, agents, creative_lab, sync, navigation, branding, admin
-
-__all__ = ["auth", "clinics", "agents", "creative_lab", "sync", "navigation", "branding", "admin"]
+Each router is imported individually by main.py.
+This __init__ exists for package structure only.
+"""
