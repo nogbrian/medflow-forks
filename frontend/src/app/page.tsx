@@ -226,9 +226,12 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              <Button variant="secondary" className="w-full mt-6" asChild>
-                <a href="/agenda">Ver Agenda Completa</a>
-              </Button>
+              <a
+                href="/agenda"
+                className="block w-full mt-6 px-6 py-3 text-center text-sm font-medium uppercase tracking-wider border border-graphite bg-white text-ink shadow-hard hover:bg-paper transition-all duration-100"
+              >
+                Ver Agenda Completa
+              </a>
             </CardContent>
           </Card>
 
