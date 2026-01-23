@@ -14,6 +14,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG API_URL=http://integration:8000
+ENV API_URL=${API_URL}
+
 RUN npm run build
 
 # Production image, copy all the files and run next
