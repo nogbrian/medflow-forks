@@ -1,0 +1,13 @@
+[project]
+name = "intel-api"
+version = "2.0.0"
+description = "Instagram intelligence and ads transparency API"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]

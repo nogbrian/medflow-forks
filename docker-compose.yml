@@ -57,7 +57,7 @@ services:
       # Scraping
       APIFY_TOKEN: ${APIFY_TOKEN:-}
       # CORS
-      CORS_ORIGINS_RAW: ${CORS_ORIGINS_RAW:-https://medflow.trafegoparaconsultorios.com.br,https://studio.trafegoparaconsultorios.com.br,https://app.agno.com}
+      CORS_ORIGINS_RAW: ${CORS_ORIGINS_RAW:-https://medflow.trafegoparaconsultorios.com.br,https://studio.trafegoparaconsultorios.com.br,https://intel.trafegoparaconsultorios.com.br,https://app.agno.com}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -137,6 +137,87 @@ services:
       resources:
         limits:
           memory: 256M
+
+
+  intel-api:
+    build:
+      context: ./intel-api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8001"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.intel-api.rule=Host(`intel.trafegoparaconsultorios.com.br`) && (PathPrefix(`/api`) || Path(`/health`))"
+      - "traefik.http.routers.intel-api.entrypoints=https"
+      - "traefik.http.routers.intel-api.tls=true"
+      - "traefik.http.routers.intel-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.intel-api.middlewares=intel-auth"
+      - "traefik.http.middlewares.intel-auth.forwardauth.address=http://integration:8000/api/auth/verify"
+      - "traefik.http.middlewares.intel-auth.forwardauth.trustForwardHeader=true"
+      - "traefik.http.services.intel-api.loadbalancer.server.port=8001"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      APIFY_TOKEN: ${APIFY_TOKEN:-}
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      XAI_API_KEY: ${XAI_API_KEY:-}
+      DEBUG: ${DEBUG:-false}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      integration:
+        condition: service_healthy
+    networks:
+      - coolify
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  intel-web:
+    build:
+      context: ./intel-web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "3002"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.intel-web.rule=Host(`intel.trafegoparaconsultorios.com.br`)"
+      - "traefik.http.routers.intel-web.entrypoints=https"
+      - "traefik.http.routers.intel-web.tls=true"
+      - "traefik.http.routers.intel-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.intel-web.middlewares=intel-web-auth"
+      - "traefik.http.middlewares.intel-web-auth.forwardauth.address=http://integration:8000/api/auth/verify"
+      - "traefik.http.middlewares.intel-web-auth.forwardauth.trustForwardHeader=true"
+      - "traefik.http.services.intel-web.loadbalancer.server.port=3002"
+    environment:
+      NEXT_PUBLIC_API_URL: https://intel.trafegoparaconsultorios.com.br/api
+      INTEL_API_URL: http://intel-api:8001
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      NODE_ENV: production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      intel-api:
+        condition: service_healthy
+    networks:
+      - coolify
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
 
 networks:

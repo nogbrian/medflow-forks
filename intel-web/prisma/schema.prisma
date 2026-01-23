@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Workspace {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  color       String    @default("#6366f1")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  profiles    Profile[]
+
+  // AI Relations
+  brandProfiles   BrandProfile[]
+  aiConversations AIConversation[]
+  generatedImages GeneratedImage[]
+
+  @@map("workspaces")
+}
+
+model Profile {
+  id                String      @id @default(uuid())
+  workspaceId       String      @map("workspace_id")
+  instagramId       String?     @map("instagram_id")
+  username          String
+  fullName          String?     @map("full_name")
+  biography         String?
+  externalUrl       String?     @map("external_url")
+  followersCount    Int         @default(0) @map("followers_count")
+  followsCount      Int         @default(0) @map("follows_count")
+  postsCount        Int         @default(0) @map("posts_count")
+  isVerified        Boolean     @default(false) @map("is_verified")
+  isBusinessAccount Boolean     @default(false) @map("is_business_account")
+  businessCategory  String?     @map("business_category")
+  profilePicUrl     String?     @map("profile_pic_url")
+  isActive          Boolean     @default(true) @map("is_active")
+  lastScrapedAt     DateTime?   @map("last_scraped_at")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  workspace  Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  posts      Post[]
+  scrapeRuns ScrapeRun[]
+
+  @@index([workspaceId])
+  @@index([username])
+  @@index([instagramId])
+  @@index([isActive])
+  @@map("profiles")
+}
+
+model Post {
+  id                 String    @id @default(uuid())
+  profileId          String    @map("profile_id")
+  instagramId        String    @unique @map("instagram_id")
+  shortCode          String?   @map("short_code")
+  type               String    @default("Image")
+  url                String?
+  displayUrl         String?   @map("display_url")
+  caption            String?
+  likesCount         Int       @default(0) @map("likes_count")
+  commentsCount      Int       @default(0) @map("comments_count")
+  videoViewCount     Int?      @map("video_view_count")
+  videoPlayCount     Int?      @map("video_play_count")
+  videoDuration      Float?    @map("video_duration")
+  isReel             Boolean   @default(false) @map("is_reel")
+  isPinned           Boolean   @default(false) @map("is_pinned")
+  isSponsored        Boolean   @default(false) @map("is_sponsored")
+  isCommentsDisabled Boolean   @default(false) @map("is_comments_disabled")
+  locationName       String?   @map("location_name")
+  locationId         String?   @map("location_id")
+  altText            String?   @map("alt_text")
+  postedAt           DateTime? @map("posted_at")
+  scrapedAt          DateTime  @default(now()) @map("scraped_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  profile  Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  hashtags Hashtag[]
+  mentions Mention[]
+
+  @@index([profileId])
+  @@index([postedAt])
+  @@index([isReel])
+  @@map("posts")
+}
+
+model Hashtag {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  tag       String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, tag])
+  @@map("hashtags")
+}
+
+model Mention {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  username  String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, username])
+  @@map("mentions")
+}
+
+model ScrapeRun {
+  id           String    @id @default(uuid())
+  profileId    String    @map("profile_id")
+  status       String    @default("pending")
+  scrapeType   String?   @map("scrape_type")
+  postsScraped Int       @default(0) @map("posts_scraped")
+  reelsScraped Int       @default(0) @map("reels_scraped")
+  errorMessage String?   @map("error_message")
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("scrape_runs")
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+// ============================================================
+// AI Models
+// ============================================================
+
+model BrandProfile {
+  id            String   @id @default(uuid())
+  workspaceId   String   @map("workspace_id")
+  name          String
+  description   String?  @db.Text
+  colorPalette  Json?    @map("color_palette")
+  typography    Json?
+  visualStyle   String?  @map("visual_style") @db.Text
+  logoUrl       String?  @map("logo_url")
+  brandManualUrl String? @map("brand_manual_url")
+  aiSynthesis   String?  @map("ai_synthesis") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  workspace     Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  conversations AIConversation[]
+
+  @@index([workspaceId])
+  @@index([name])
+  @@map("brand_profiles")
+}
+
+model AIConversation {
+  id             String   @id @default(uuid())
+  workspaceId    String   @map("workspace_id")
+  brandProfileId String?  @map("brand_profile_id")
+  title          String?
+  agentType      String   @map("agent_type")  // 'creative', 'copywriter'
+  provider       String                        // 'gemini', 'openai', 'xai'
+  systemPrompt   String?  @map("system_prompt") @db.Text
+  context        Json?                         // ICP, SPU, etc.
+  isArchived     String   @default("false") @map("is_archived")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  brandProfile BrandProfile? @relation(fields: [brandProfileId], references: [id], onDelete: SetNull)
+  messages     AIMessage[]
+
+  @@index([workspaceId])
+  @@index([agentType])
+  @@index([createdAt])
+  @@map("ai_conversations")
+}
+
+model AIMessage {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  role           String                          // 'user', 'assistant', 'system'
+  content        String   @db.Text
+  images         String[]
+  tokenCount     Int?     @map("token_count")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([createdAt])
+  @@map("ai_messages")
+}
+
+model GeneratedImage {
+  id             String   @id @default(uuid())
+  workspaceId    String   @map("workspace_id")
+  conversationId String?  @map("conversation_id")
+  provider       String
+  model          String?
+  stylePrompt    String?  @map("style_prompt") @db.Text
+  contentPrompt  String   @map("content_prompt") @db.Text
+  aspectRatio    String   @map("aspect_ratio")
+  imageUrl       String   @map("image_url")
+  thumbnailUrl   String?  @map("thumbnail_url")
+  metadata       Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([conversationId])
+  @@index([createdAt])
+  @@map("generated_images")
+}

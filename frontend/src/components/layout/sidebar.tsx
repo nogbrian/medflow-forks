@@ -13,6 +13,7 @@ import {
   Plug,
   X,
   LogOut,
+  Radar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -70,6 +71,12 @@ const navigation: NavSection[] = [
     title: "Creative Lab",
     items: [
       { href: "/creative", label: "Creative Studio", icon: Image },
+    ],
+  },
+  {
+    title: "Inteligência",
+    items: [
+      { href: "https://intel.trafegoparaconsultorios.com.br", label: "Viral Finder", icon: Radar },
     ],
   },
   {
