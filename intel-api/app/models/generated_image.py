@@ -30,7 +30,7 @@ class GeneratedImage(Base):
     thumbnail_url = Column(String, nullable=True)
 
     # Metadata
-    metadata = Column(JSONB, nullable=True)  # Extra params, quality, etc.
+    image_metadata = Column("metadata", JSONB, nullable=True)  # Extra params, quality, etc.
 
     # Timestamp
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
