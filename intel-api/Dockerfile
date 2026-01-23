@@ -12,6 +12,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+ARG CACHEBUST=1
 COPY app/ ./app/
 
 RUN useradd -m -u 1000 appuser && \
