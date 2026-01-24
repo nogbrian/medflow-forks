@@ -23,12 +23,12 @@ export function AgentChatFab() {
     <button
       onClick={toggle}
       aria-label={isOpen ? "Fechar chat" : "Abrir chat"}
-      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-ink text-white shadow-[4px_4px_0px_0px_#F24E1E] transition-transform duration-150 ease-out hover:scale-105 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_#F24E1E]"
+      className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-ink text-white shadow-[4px_4px_0px_0px_#F24E1E] transition-all duration-150 ease-out hover:scale-105 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_#F24E1E] md:bottom-6 md:right-6 md:h-14 md:w-14"
     >
       <span
         className={`transition-transform duration-200 ${isOpen ? "rotate-90" : "rotate-0"}`}
       >
-        {isOpen ? <X className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
+        {isOpen ? <X className="h-5 w-5 md:h-6 md:w-6" /> : <Sparkles className="h-5 w-5 md:h-6 md:w-6" />}
       </span>
 
       {hasNotification && !isOpen && (

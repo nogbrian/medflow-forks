@@ -68,7 +68,7 @@ export function AgentChatMessages({ onSuggestionClick }: AgentChatMessagesProps)
 
   if (messages.length === 0) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 p-6">
+      <div className="flex h-full flex-col items-center justify-center gap-4 p-4 md:p-6">
         <Sparkles className="h-8 w-8 text-ink/30" />
         <p className="text-center text-sm text-ink/50">
           Como posso ajudar com seu marketing médico?
@@ -89,7 +89,7 @@ export function AgentChatMessages({ onSuggestionClick }: AgentChatMessagesProps)
   }
 
   return (
-    <div ref={scrollRef} className="flex h-full flex-col gap-3 overflow-y-auto p-4">
+    <div ref={scrollRef} className="flex h-full flex-col gap-3 overflow-y-auto p-3 md:p-4">
       {messages.map((msg) => (
         <MessageBubble key={msg.id} message={msg} />
       ))}

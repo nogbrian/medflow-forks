@@ -55,7 +55,7 @@ export function AgentChatInput({ onSend }: AgentChatInputProps) {
   );
 
   return (
-    <div className="flex items-end gap-2 border-t border-graphite bg-white p-3">
+    <div className="flex items-end gap-2 border-t border-graphite bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <textarea
         ref={textareaRef}
         rows={MIN_ROWS}

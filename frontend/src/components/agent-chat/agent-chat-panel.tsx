@@ -52,10 +52,18 @@ export function AgentChatPanel() {
 
   return (
     <>
-      {/* Panel */}
+      {/* Panel — bottom sheet on mobile, side panel on desktop */}
       <aside
-        className={`fixed inset-y-0 right-0 z-sidebar flex w-full flex-col border-l border-graphite bg-white transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] sm:w-[420px] ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed z-sidebar flex flex-col border-graphite bg-white transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          // Mobile: bottom sheet
+          "inset-x-0 bottom-0 h-[85vh] rounded-t-xl border-t shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
+        } ${
+          // Desktop: right side panel
+          "md:inset-y-0 md:right-0 md:left-auto md:h-auto md:w-[420px] md:rounded-none md:border-l md:border-t-0 md:shadow-none"
+        } ${
+          isOpen
+            ? "translate-y-0 md:translate-x-0 md:translate-y-0"
+            : "translate-y-full md:translate-x-full md:translate-y-0"
         }`}
         aria-label="Agent Chat"
         role="complementary"
