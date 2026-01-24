@@ -14,10 +14,18 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from core.auth import CurrentUser, DBSession
+from core.auth import OptionalCurrentUser, DBSession
 
 router = APIRouter(prefix="/chat")
 logger = logging.getLogger(__name__)
+
+
+class ChatContext(BaseModel):
+    """Optional context from the frontend."""
+
+    pathname: str | None = None
+    activeTenant: str | None = None
+    activeContext: str | None = None
 
 
 class ChatRequest(BaseModel):
@@ -28,6 +36,7 @@ class ChatRequest(BaseModel):
     agent_type: str = "general"  # general, sdr, support, content, scheduler
     clinic_id: str | None = None
     tools: list[str] | None = None  # Specific tools to enable
+    context: ChatContext | None = None
     stream: bool = True
 
 
@@ -46,7 +55,7 @@ class ChatResponse(BaseModel):
 @router.post("/stream")
 async def chat_stream(
     request: ChatRequest,
-    current_user: CurrentUser = None,
+    current_user: OptionalCurrentUser = None,
     db: DBSession = None,
 ):
     """Stream an agent response via Server-Sent Events.
@@ -121,7 +130,7 @@ async def chat_stream(
 @router.post("", response_model=ChatResponse)
 async def chat_sync(
     request: ChatRequest,
-    current_user: CurrentUser = None,
+    current_user: OptionalCurrentUser = None,
     db: DBSession = None,
 ):
     """Non-streaming chat endpoint.
