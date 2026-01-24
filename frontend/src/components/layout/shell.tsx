@@ -6,6 +6,7 @@ import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
+import { AgentChatFab, AgentChatPanel } from "@/components/agent-chat";
 
 /**
  * Shell Layout Industrial
@@ -61,6 +62,9 @@ export function Shell({ children }: ShellProps) {
           {children}
         </div>
       </main>
+
+      <AgentChatPanel />
+      <AgentChatFab />
     </div>
   );
 }
