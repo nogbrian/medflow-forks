@@ -4,16 +4,18 @@ import { ExternalLink, Maximize2, RefreshCw } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useSsoUrl } from "@/hooks/use-sso-url";
 
 /**
  * CRM Page - Twenty CRM Embed
  *
- * Integra o Twenty CRM via iframe.
- * Header com navegação e ações rápidas.
+ * Uses SSO endpoint to auto-login the user into Twenty CRM.
+ * Falls back to the base URL if SSO is not configured.
  */
 
 export default function CRMPage() {
   const twentyUrl = process.env.NEXT_PUBLIC_TWENTY_URL || "http://localhost:3004";
+  const { url: iframeSrc, loading, error: ssoError } = useSsoUrl("twenty", twentyUrl);
 
   return (
     <Shell>
@@ -27,6 +29,9 @@ export default function CRMPage() {
             <Badge variant="info">
               Twenty CRM
             </Badge>
+            {ssoError && (
+              <Badge variant="warning">Login manual</Badge>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -66,13 +71,19 @@ export default function CRMPage() {
 
       {/* Iframe Container */}
       <div className="h-[calc(100dvh-8rem)] bg-white border-x border-graphite">
-        <iframe
-          id="crm-frame"
-          src={twentyUrl}
-          className="w-full h-full border-0"
-          title="Twenty CRM"
-          allow="clipboard-read; clipboard-write"
-        />
+        {!loading && iframeSrc ? (
+          <iframe
+            id="crm-frame"
+            src={iframeSrc}
+            className="w-full h-full border-0"
+            title="Twenty CRM"
+            allow="clipboard-read; clipboard-write"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <span className="size-6 border-2 border-ink border-t-transparent animate-spin" />
+          </div>
+        )}
       </div>
     </Shell>
   );

@@ -4,15 +4,18 @@ import { ExternalLink, Maximize2, RefreshCw } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useSsoUrl } from "@/hooks/use-sso-url";
 
 /**
  * Agenda Page - Cal.com Embed
  *
- * Integra o Cal.com via iframe.
+ * Uses SSO endpoint for authenticated Cal.com access.
+ * Falls back to the base URL (public pages don't require auth).
  */
 
 export default function AgendaPage() {
   const calcomUrl = process.env.NEXT_PUBLIC_CALCOM_URL || "http://localhost:3002";
+  const { url: iframeSrc, loading, error: ssoError } = useSsoUrl("calcom", calcomUrl);
 
   return (
     <Shell>
@@ -26,6 +29,9 @@ export default function AgendaPage() {
             <Badge variant="info">
               Cal.com
             </Badge>
+            {ssoError && (
+              <Badge variant="warning">Login manual</Badge>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -65,13 +71,19 @@ export default function AgendaPage() {
 
       {/* Iframe Container */}
       <div className="h-[calc(100dvh-8rem)] bg-white border-x border-graphite">
-        <iframe
-          id="agenda-frame"
-          src={calcomUrl}
-          className="w-full h-full border-0"
-          title="Cal.com Agenda"
-          allow="clipboard-read; clipboard-write"
-        />
+        {!loading && iframeSrc ? (
+          <iframe
+            id="agenda-frame"
+            src={iframeSrc}
+            className="w-full h-full border-0"
+            title="Cal.com Agenda"
+            allow="clipboard-read; clipboard-write"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <span className="size-6 border-2 border-ink border-t-transparent animate-spin" />
+          </div>
+        )}
       </div>
     </Shell>
   );

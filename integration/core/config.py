@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     calcom_event_type_id_default: int = 1
     chatwoot_api_url: str = "https://inbox.trafegoparaconsultorios.com.br"
     chatwoot_api_key: str | None = None
+    chatwoot_platform_token: str | None = None  # Platform App token for SSO
     chatwoot_account_id: str = "1"
     chatwoot_inbox_id: str = "1"
     chatwoot_human_team_id: str = "1"

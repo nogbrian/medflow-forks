@@ -4,15 +4,18 @@ import { ExternalLink, Maximize2, RefreshCw } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useSsoUrl } from "@/hooks/use-sso-url";
 
 /**
  * Inbox Page - Chatwoot Embed
  *
- * Integra o Chatwoot via iframe.
+ * Uses SSO endpoint to auto-login the user into Chatwoot.
+ * Falls back to the base URL if SSO is not configured.
  */
 
 export default function InboxPage() {
   const chatwootUrl = process.env.NEXT_PUBLIC_CHATWOOT_URL || "http://localhost:3003";
+  const { url: iframeSrc, loading, error: ssoError } = useSsoUrl("chatwoot", chatwootUrl);
 
   return (
     <Shell>
@@ -26,6 +29,9 @@ export default function InboxPage() {
             <Badge variant="info">
               Chatwoot
             </Badge>
+            {ssoError && (
+              <Badge variant="warning">Login manual</Badge>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -65,13 +71,19 @@ export default function InboxPage() {
 
       {/* Iframe Container */}
       <div className="h-[calc(100dvh-8rem)] bg-white border-x border-graphite">
-        <iframe
-          id="inbox-frame"
-          src={chatwootUrl}
-          className="w-full h-full border-0"
-          title="Chatwoot Inbox"
-          allow="clipboard-read; clipboard-write"
-        />
+        {!loading && iframeSrc ? (
+          <iframe
+            id="inbox-frame"
+            src={iframeSrc}
+            className="w-full h-full border-0"
+            title="Chatwoot Inbox"
+            allow="clipboard-read; clipboard-write"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <span className="size-6 border-2 border-ink border-t-transparent animate-spin" />
+          </div>
+        )}
       </div>
     </Shell>
   );

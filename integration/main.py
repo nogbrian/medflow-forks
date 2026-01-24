@@ -377,3 +377,11 @@ try:
     logger.info("Dashboard routes loaded")
 except Exception as e:
     logger.error(f"Failed to load dashboard routes: {e}")
+
+# Import SSO routes (iframe auto-login)
+try:
+    from api.routes.sso import router as sso_router
+    app.include_router(sso_router, prefix="/api", tags=["SSO"])
+    logger.info("SSO routes loaded")
+except Exception as e:
+    logger.error(f"Failed to load SSO routes: {e}")
