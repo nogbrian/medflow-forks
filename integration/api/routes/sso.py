@@ -41,7 +41,14 @@ async def get_sso_url(service: ServiceName, current_user: CurrentUser):
     """Get an authenticated URL for the specified embedded service.
 
     Returns a single-use SSO URL that auto-logs the user into the service.
+    Only superusers have SSO access for now.
     """
+    if current_user.role != "superuser":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="SSO access is restricted to superusers",
+        )
+
     handlers = {
         ServiceName.chatwoot: _get_chatwoot_sso,
         ServiceName.twenty: _get_twenty_sso,
