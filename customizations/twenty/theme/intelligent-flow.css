@@ -1,0 +1,621 @@
+/**
+ * MedFlow Intelligent Flow Theme - Twenty CRM Override
+ *
+ * Design System: Intelligent Flow
+ * - Glassmorphism (backdrop-blur, transparency)
+ * - Soft corners (8-32px border radius)
+ * - Glow shadows
+ * - Hover animations
+ * - Fonts: Clash Display (titles), Satoshi (body), JetBrains Mono (data)
+ */
+
+/* =============================================================================
+   CSS CUSTOM PROPERTIES (TOKENS)
+   ============================================================================= */
+
+:root {
+  /* Intelligent Flow Colors */
+  --color-eng-blue: #0F3038;
+  --color-eng-blue-90: rgba(15, 48, 56, 0.9);
+  --color-eng-blue-80: rgba(15, 48, 56, 0.8);
+  --color-eng-blue-60: rgba(15, 48, 56, 0.6);
+  --color-eng-blue-30: rgba(15, 48, 56, 0.3);
+  --color-eng-blue-10: rgba(15, 48, 56, 0.1);
+  --color-eng-blue-05: rgba(15, 48, 56, 0.05);
+  --color-eng-blue-08: rgba(15, 48, 56, 0.08);
+  --color-eng-blue-06: rgba(15, 48, 56, 0.06);
+
+  --color-alert: #FF6400;
+  --color-alert-90: rgba(255, 100, 0, 0.9);
+  --color-alert-80: rgba(255, 100, 0, 0.8);
+  --color-alert-30: rgba(255, 100, 0, 0.3);
+  --color-alert-10: rgba(255, 100, 0, 0.1);
+  --color-alert-05: rgba(255, 100, 0, 0.05);
+  --color-alert-08: rgba(255, 100, 0, 0.08);
+
+  --color-concrete: #808080;
+  --color-tech-white: #F5F5F2;
+  --color-white: #FFFFFF;
+
+  /* Mapeamento para variáveis do Twenty */
+  --twenty-background-color-primary: var(--color-tech-white);
+  --twenty-background-color-secondary: rgba(255, 255, 255, 0.8);
+  --twenty-border-color-medium: var(--color-eng-blue-08);
+  --twenty-accent-primary: var(--color-alert);
+  --twenty-accent-secondary: var(--color-eng-blue);
+  --twenty-font-color-primary: var(--color-eng-blue);
+  --twenty-font-color-secondary: var(--color-concrete);
+
+  /* Tipografia Intelligent Flow */
+  --font-display: "Clash Display", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "Satoshi", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+
+  /* Sombras Intelligent Flow */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+  --shadow-2xl: 0 24px 64px rgba(0, 0, 0, 0.16);
+  --shadow-glow-orange: 0 8px 32px rgba(255, 100, 0, 0.3);
+  --shadow-glow-blue: 0 8px 32px rgba(15, 48, 56, 0.2);
+
+  /* Border Radius Intelligent Flow */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+}
+
+/* =============================================================================
+   FONTS IMPORT
+   ============================================================================= */
+
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* =============================================================================
+   LAYOUT BASE
+   ============================================================================= */
+
+body {
+  background-color: var(--color-tech-white) !important;
+  font-family: var(--font-sans) !important;
+  color: var(--color-eng-blue) !important;
+}
+
+/* Sidebar do Twenty */
+[data-testid="left-panel"],
+.left-panel,
+nav[role="navigation"] {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-right: 1px solid var(--color-eng-blue-06) !important;
+}
+
+/* Main content area */
+main,
+[data-testid="main-content"],
+.main-content {
+  background-color: var(--color-tech-white) !important;
+}
+
+/* =============================================================================
+   TIPOGRAFIA
+   ============================================================================= */
+
+/* Headlines - Clash Display */
+h1, h2, h3, h4, h5, h6,
+.title,
+[class*="title"],
+[class*="heading"] {
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--color-eng-blue) !important;
+}
+
+h1 { font-size: 2rem !important; }
+h2 { font-size: 1.5rem !important; }
+h3 { font-size: 1.25rem !important; }
+h4 { font-size: 1rem !important; }
+
+/* Dados e métricas - JetBrains Mono */
+.metric,
+.data,
+.number,
+.count,
+.amount,
+.date,
+.time,
+.id,
+.code,
+[class*="metric"],
+[class*="count"],
+[class*="amount"],
+[class*="number"],
+table td:first-child,
+code,
+pre {
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  letter-spacing: 0 !important;
+}
+
+/* Body text - Satoshi */
+p, span, div, li {
+  font-family: var(--font-sans) !important;
+}
+
+/* =============================================================================
+   BOTÕES
+   ============================================================================= */
+
+button,
+[role="button"],
+.button,
+[class*="button"],
+[class*="Button"],
+a[class*="button"],
+input[type="submit"],
+input[type="button"] {
+  background-color: var(--color-eng-blue) !important;
+  color: var(--color-white) !important;
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  transition: all 0.3s ease !important;
+}
+
+button:hover,
+[role="button"]:hover,
+.button:hover,
+[class*="button"]:hover,
+[class*="Button"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+button:active,
+[role="button"]:active,
+.button:active,
+[class*="button"]:active,
+[class*="Button"]:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Botão primário (ação principal) */
+button[class*="primary"],
+[class*="button-primary"],
+[class*="ButtonPrimary"],
+.primary-button {
+  background-color: var(--color-alert) !important;
+  box-shadow: var(--shadow-md), var(--shadow-glow-orange) !important;
+}
+
+button[class*="primary"]:hover {
+  box-shadow: var(--shadow-lg), 0 12px 40px rgba(255, 100, 0, 0.4) !important;
+}
+
+/* Botão secundário */
+button[class*="secondary"],
+[class*="button-secondary"],
+[class*="ButtonSecondary"],
+.secondary-button {
+  background-color: transparent !important;
+  color: var(--color-eng-blue) !important;
+  border: 2px solid var(--color-eng-blue-30) !important;
+}
+
+button[class*="secondary"]:hover {
+  border-color: var(--color-eng-blue) !important;
+  background-color: var(--color-eng-blue-05) !important;
+}
+
+/* Botão ghost */
+button[class*="ghost"],
+[class*="button-ghost"],
+.ghost-button {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+button[class*="ghost"]:hover {
+  background-color: var(--color-eng-blue-05) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* =============================================================================
+   INPUTS E FORMS
+   ============================================================================= */
+
+input,
+textarea,
+select,
+[class*="input"],
+[class*="Input"],
+[class*="select"],
+[class*="Select"],
+[class*="textarea"] {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border: 2px solid var(--color-eng-blue-10) !important;
+  border-radius: var(--radius-md) !important;
+  font-family: var(--font-sans) !important;
+  padding: 0.875rem 1.25rem !important;
+  color: var(--color-eng-blue) !important;
+  transition: all 0.3s ease !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+[class*="input"]:focus,
+[class*="Input"]:focus {
+  outline: none !important;
+  border-color: var(--color-alert) !important;
+  box-shadow: 0 0 0 4px var(--color-alert-10) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-concrete) !important;
+}
+
+label,
+[class*="label"],
+[class*="Label"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--color-concrete) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* =============================================================================
+   CARDS
+   ============================================================================= */
+
+[class*="card"],
+[class*="Card"],
+.card,
+[data-testid*="card"],
+article {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 1.5rem !important;
+  transition: all 0.4s ease !important;
+}
+
+[class*="card"]:hover,
+[class*="Card"]:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--shadow-xl) !important;
+  border-color: var(--color-alert-30) !important;
+}
+
+/* =============================================================================
+   TABELAS
+   ============================================================================= */
+
+table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  font-family: var(--font-sans) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden !important;
+}
+
+table th {
+  background-color: var(--color-eng-blue) !important;
+  color: var(--color-white) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 1rem !important;
+  text-align: left !important;
+}
+
+table td {
+  padding: 1rem !important;
+  border-bottom: 1px solid var(--color-eng-blue-06) !important;
+  background-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+table tr:hover td {
+  background-color: var(--color-alert-05) !important;
+}
+
+/* =============================================================================
+   BADGES / TAGS
+   ============================================================================= */
+
+[class*="badge"],
+[class*="Badge"],
+[class*="tag"],
+[class*="Tag"],
+[class*="chip"],
+[class*="Chip"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.375rem 0.75rem !important;
+  border-radius: 9999px !important;
+  background-color: var(--color-eng-blue-05) !important;
+  color: var(--color-eng-blue) !important;
+  border: none !important;
+}
+
+/* Badge de sucesso */
+[class*="badge"][class*="success"],
+[class*="Badge"][class*="success"],
+[class*="badge-green"],
+[class*="green"] {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: #059669 !important;
+}
+
+/* Badge de warning */
+[class*="badge"][class*="warning"],
+[class*="Badge"][class*="warning"],
+[class*="badge-orange"],
+[class*="orange"] {
+  background-color: var(--color-alert-10) !important;
+  color: var(--color-alert) !important;
+}
+
+/* Badge de info */
+[class*="badge"][class*="info"],
+[class*="Badge"][class*="info"],
+[class*="badge-blue"],
+[class*="blue"] {
+  background-color: var(--color-eng-blue-10) !important;
+  color: var(--color-eng-blue) !important;
+}
+
+/* =============================================================================
+   MODALS / DIALOGS
+   ============================================================================= */
+
+[class*="modal"],
+[class*="Modal"],
+[class*="dialog"],
+[class*="Dialog"],
+[role="dialog"] {
+  background-color: var(--color-white) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-2xl) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+}
+
+/* Modal overlay */
+[class*="overlay"],
+[class*="Overlay"],
+[class*="backdrop"] {
+  background-color: rgba(15, 48, 56, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* =============================================================================
+   DROPDOWN / MENUS
+   ============================================================================= */
+
+[class*="dropdown"],
+[class*="Dropdown"],
+[class*="menu"],
+[class*="Menu"],
+[role="menu"] {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+
+[class*="dropdown"] [class*="item"],
+[class*="menu"] [class*="item"],
+[role="menuitem"] {
+  padding: 0.75rem 1rem !important;
+  font-family: var(--font-sans) !important;
+  border-radius: var(--radius-sm) !important;
+  margin: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+[class*="dropdown"] [class*="item"]:hover,
+[class*="menu"] [class*="item"]:hover,
+[role="menuitem"]:hover {
+  background-color: var(--color-alert-05) !important;
+}
+
+/* =============================================================================
+   AVATARS
+   ============================================================================= */
+
+[class*="avatar"],
+[class*="Avatar"],
+img[class*="avatar"],
+img[class*="profile"] {
+  border-radius: var(--radius-md) !important;
+  border: 2px solid var(--color-white) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* =============================================================================
+   SCROLLBARS
+   ============================================================================= */
+
+::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-tech-white) !important;
+  border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-eng-blue-30) !important;
+  border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-eng-blue-60) !important;
+}
+
+/* =============================================================================
+   TWENTY CRM ESPECÍFICO - COMPONENTES
+   ============================================================================= */
+
+/* Record Board (Kanban) */
+[data-testid="record-board"],
+.record-board {
+  background-color: var(--color-tech-white) !important;
+}
+
+[data-testid="record-board-column"],
+.record-board-column {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+/* Pipeline cards */
+[data-testid="record-board-card"],
+.record-board-card,
+[class*="opportunity-card"] {
+  background-color: var(--color-white) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: all 0.3s ease !important;
+}
+
+[data-testid="record-board-card"]:hover,
+.record-board-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* People/Companies list */
+[data-testid="record-table"],
+.record-table {
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden !important;
+}
+
+/* Search bar */
+[data-testid="search-input"],
+.search-input,
+input[type="search"] {
+  border-radius: var(--radius-xl) !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+}
+
+/* =============================================================================
+   ANIMAÇÕES
+   ============================================================================= */
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Aplicar animação em elementos que aparecem */
+[class*="enter"],
+[class*="Enter"],
+[data-state="open"] {
+  animation: scaleIn 0.3s ease-out !important;
+}
+
+/* =============================================================================
+   HOVER STATES
+   ============================================================================= */
+
+*:hover {
+  transition: all 0.3s ease !important;
+}
+
+*:disabled,
+[aria-disabled="true"],
+.disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Estado de loading */
+[class*="loading"],
+[class*="Loading"],
+[class*="spinner"],
+[class*="Spinner"] {
+  border-color: var(--color-eng-blue-10) !important;
+  border-top-color: var(--color-alert) !important;
+}
+
+/* =============================================================================
+   RESPONSIVIDADE
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  button,
+  [role="button"],
+  .button {
+    padding: 0.625rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  [class*="card"],
+  [class*="Card"] {
+    border-radius: var(--radius-md) !important;
+  }
+
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1rem !important; }
+}

@@ -1,0 +1,623 @@
+/**
+ * MedFlow Intelligent Flow Theme - Cal.com Override
+ *
+ * Design System: Intelligent Flow
+ * - Glassmorphism (backdrop-blur, transparency)
+ * - Soft corners (8-32px border radius)
+ * - Glow shadows
+ * - Hover animations
+ * - Fonts: Clash Display (titles), Satoshi (body), JetBrains Mono (data)
+ */
+
+/* =============================================================================
+   CSS CUSTOM PROPERTIES (TOKENS)
+   ============================================================================= */
+
+:root {
+  /* Intelligent Flow Colors */
+  --color-eng-blue: #0F3038;
+  --color-eng-blue-90: rgba(15, 48, 56, 0.9);
+  --color-eng-blue-80: rgba(15, 48, 56, 0.8);
+  --color-eng-blue-60: rgba(15, 48, 56, 0.6);
+  --color-eng-blue-30: rgba(15, 48, 56, 0.3);
+  --color-eng-blue-10: rgba(15, 48, 56, 0.1);
+  --color-eng-blue-05: rgba(15, 48, 56, 0.05);
+  --color-eng-blue-08: rgba(15, 48, 56, 0.08);
+  --color-eng-blue-06: rgba(15, 48, 56, 0.06);
+
+  --color-alert: #FF6400;
+  --color-alert-90: rgba(255, 100, 0, 0.9);
+  --color-alert-80: rgba(255, 100, 0, 0.8);
+  --color-alert-30: rgba(255, 100, 0, 0.3);
+  --color-alert-10: rgba(255, 100, 0, 0.1);
+  --color-alert-05: rgba(255, 100, 0, 0.05);
+
+  --color-concrete: #808080;
+  --color-tech-white: #F5F5F2;
+  --color-white: #FFFFFF;
+
+  /* Mapeamento para variáveis do Cal.com */
+  --cal-bg: var(--color-tech-white);
+  --cal-bg-emphasis: rgba(255, 255, 255, 0.9);
+  --cal-bg-subtle: var(--color-tech-white);
+  --cal-bg-muted: var(--color-tech-white);
+  --cal-bg-inverted: var(--color-eng-blue);
+
+  --cal-border: var(--color-eng-blue-08);
+  --cal-border-emphasis: var(--color-eng-blue-10);
+  --cal-border-subtle: var(--color-eng-blue-06);
+
+  --cal-text: var(--color-eng-blue);
+  --cal-text-emphasis: var(--color-eng-blue);
+  --cal-text-subtle: var(--color-concrete);
+  --cal-text-muted: var(--color-concrete);
+  --cal-text-inverted: var(--color-white);
+
+  --cal-brand: var(--color-alert);
+  --cal-brand-emphasis: #E55A00;
+  --cal-brand-subtle: rgba(255, 100, 0, 0.1);
+  --cal-brand-text: var(--color-white);
+
+  /* Tipografia */
+  --font-display: "Clash Display", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "Satoshi", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+
+  /* Sombras Intelligent Flow */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+  --shadow-glow-orange: 0 8px 32px rgba(255, 100, 0, 0.3);
+
+  /* Border Radius */
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --cal-border-radius: 12px;
+}
+
+/* =============================================================================
+   FONTS IMPORT
+   ============================================================================= */
+
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* =============================================================================
+   LAYOUT BASE
+   ============================================================================= */
+
+body,
+html {
+  background-color: var(--color-tech-white) !important;
+  font-family: var(--font-sans) !important;
+  color: var(--color-eng-blue) !important;
+}
+
+/* Main container */
+main,
+[class*="main"],
+.main-container {
+  background-color: var(--color-tech-white) !important;
+}
+
+/* Sidebar */
+aside,
+[class*="sidebar"],
+nav {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid var(--color-eng-blue-06) !important;
+}
+
+/* =============================================================================
+   TIPOGRAFIA
+   ============================================================================= */
+
+/* Headlines - Clash Display */
+h1, h2, h3, h4, h5, h6,
+[class*="title"],
+[class*="heading"],
+[class*="Title"],
+[class*="Heading"] {
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--color-eng-blue) !important;
+}
+
+h1 { font-size: 2rem !important; }
+h2 { font-size: 1.5rem !important; }
+h3 { font-size: 1.25rem !important; }
+
+/* Dados e horários - JetBrains Mono */
+time,
+.time,
+.date,
+.duration,
+[class*="time"],
+[class*="Time"],
+[class*="date"],
+[class*="Date"],
+[class*="duration"],
+[class*="Duration"],
+[class*="slot"],
+code,
+pre {
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  letter-spacing: 0 !important;
+}
+
+/* =============================================================================
+   BOOKING CALENDAR
+   ============================================================================= */
+
+/* Calendar container */
+[class*="calendar"],
+[class*="Calendar"],
+[data-testid*="calendar"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--shadow-lg) !important;
+  overflow: hidden !important;
+}
+
+/* Calendar header (month/year) */
+[class*="calendar"] [class*="header"],
+[class*="Calendar"] [class*="Header"],
+.calendar-header {
+  background-color: transparent !important;
+  color: var(--color-eng-blue) !important;
+  padding: 1.5rem !important;
+  font-family: var(--font-display) !important;
+  border-bottom: 1px solid var(--color-eng-blue-06) !important;
+}
+
+/* Day names (Sun, Mon, etc) */
+[class*="weekday"],
+[class*="Weekday"],
+[class*="day-name"],
+.day-name {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--color-concrete) !important;
+}
+
+/* Day cells */
+[class*="calendar"] button,
+[class*="Calendar"] button,
+.day-cell {
+  border: none !important;
+  border-radius: 12px !important;
+  font-family: var(--font-mono) !important;
+  transition: all 0.3s ease !important;
+  margin: 2px !important;
+}
+
+/* Available day */
+[class*="calendar"] button:not([disabled]),
+[class*="available"],
+.day-available {
+  background-color: transparent !important;
+  color: var(--color-eng-blue) !important;
+}
+
+[class*="calendar"] button:not([disabled]):hover {
+  background-color: var(--color-alert-10) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Selected day */
+[class*="selected"],
+[aria-selected="true"],
+.day-selected {
+  background: linear-gradient(135deg, var(--color-alert), #E55A00) !important;
+  color: var(--color-white) !important;
+  box-shadow: var(--shadow-sm), var(--shadow-glow-orange) !important;
+}
+
+/* Disabled/unavailable day */
+[class*="calendar"] button[disabled],
+[class*="disabled"],
+.day-disabled {
+  background-color: transparent !important;
+  color: var(--color-concrete) !important;
+  opacity: 0.4 !important;
+}
+
+/* Today indicator */
+[class*="today"],
+.day-today {
+  border: 2px solid var(--color-eng-blue) !important;
+  font-weight: 600 !important;
+}
+
+/* =============================================================================
+   TIME SLOTS
+   ============================================================================= */
+
+/* Time slots container */
+[class*="time-slots"],
+[class*="TimeSlots"],
+[class*="slots"],
+.time-slots {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: 16px !important;
+  padding: 1rem !important;
+}
+
+/* Individual time slot */
+[class*="time-slot"],
+[class*="TimeSlot"],
+[class*="slot-button"],
+.time-slot {
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  background-color: transparent !important;
+  border: 1px solid var(--color-eng-blue-10) !important;
+  border-radius: 12px !important;
+  padding: 0.875rem 1.25rem !important;
+  margin: 0.375rem 0 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+[class*="time-slot"]:hover,
+[class*="TimeSlot"]:hover,
+.time-slot:hover {
+  background-color: var(--color-alert-05) !important;
+  border-color: var(--color-alert-30) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Selected time slot */
+[class*="time-slot"][class*="selected"],
+[class*="TimeSlot"][aria-selected="true"],
+.time-slot-selected {
+  background: linear-gradient(135deg, var(--color-alert), #E55A00) !important;
+  color: var(--color-white) !important;
+  border: none !important;
+  box-shadow: var(--shadow-md), var(--shadow-glow-orange) !important;
+}
+
+/* =============================================================================
+   BOTÕES
+   ============================================================================= */
+
+button,
+[role="button"],
+[class*="button"],
+[class*="Button"],
+[class*="btn"],
+input[type="submit"] {
+  background-color: var(--color-eng-blue) !important;
+  color: var(--color-white) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-md) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  padding: 0.875rem 1.5rem !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+button:hover,
+[role="button"]:hover,
+[class*="button"]:hover,
+[class*="Button"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+button:active,
+[role="button"]:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Primary button */
+[class*="primary"],
+[class*="Primary"],
+button[class*="brand"] {
+  background: linear-gradient(135deg, var(--color-alert), #E55A00) !important;
+  box-shadow: var(--shadow-md), var(--shadow-glow-orange) !important;
+}
+
+[class*="primary"]:hover,
+[class*="Primary"]:hover {
+  box-shadow: var(--shadow-lg), 0 12px 40px rgba(255, 100, 0, 0.4) !important;
+}
+
+/* Secondary button */
+[class*="secondary"],
+[class*="Secondary"] {
+  background-color: transparent !important;
+  color: var(--color-eng-blue) !important;
+  border: 2px solid var(--color-eng-blue-30) !important;
+}
+
+[class*="secondary"]:hover,
+[class*="Secondary"]:hover {
+  border-color: var(--color-eng-blue) !important;
+  background-color: var(--color-eng-blue-05) !important;
+}
+
+/* Ghost/Subtle button */
+[class*="ghost"],
+[class*="Ghost"],
+[class*="subtle"],
+[class*="Subtle"] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+[class*="ghost"]:hover,
+[class*="subtle"]:hover {
+  background-color: var(--color-eng-blue-05) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* =============================================================================
+   INPUTS E FORMS
+   ============================================================================= */
+
+input,
+textarea,
+select,
+[class*="input"],
+[class*="Input"],
+[class*="textarea"],
+[class*="select"] {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border: 2px solid var(--color-eng-blue-10) !important;
+  border-radius: 12px !important;
+  font-family: var(--font-sans) !important;
+  padding: 0.875rem 1.25rem !important;
+  color: var(--color-eng-blue) !important;
+  transition: all 0.3s ease !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: var(--color-alert) !important;
+  box-shadow: 0 0 0 4px var(--color-alert-10) !important;
+}
+
+label,
+[class*="label"],
+[class*="Label"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--color-concrete) !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* =============================================================================
+   BOOKING FORM
+   ============================================================================= */
+
+/* Form container */
+[class*="booking-form"],
+[class*="BookingForm"],
+form[class*="booking"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 2rem !important;
+}
+
+/* Form sections */
+[class*="booking-form"] > div,
+[class*="form-section"] {
+  padding: 1rem 0 !important;
+  border-bottom: 1px solid var(--color-eng-blue-06) !important;
+}
+
+/* =============================================================================
+   EVENT TYPE CARDS
+   ============================================================================= */
+
+[class*="event-type"],
+[class*="EventType"],
+[class*="eventtype"],
+.event-type-card {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 1.5rem !important;
+  margin: 0.75rem 0 !important;
+  transition: all 0.4s ease !important;
+}
+
+[class*="event-type"]:hover,
+[class*="EventType"]:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--shadow-xl) !important;
+  border-color: var(--color-alert-30) !important;
+}
+
+/* Event type duration badge */
+[class*="event-type"] [class*="duration"],
+[class*="EventType"] [class*="Duration"],
+.event-duration {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  padding: 0.375rem 0.75rem !important;
+  border-radius: 9999px !important;
+  background-color: var(--color-eng-blue-05) !important;
+  color: var(--color-eng-blue) !important;
+  border: none !important;
+}
+
+/* =============================================================================
+   AVATAR / PROFILE
+   ============================================================================= */
+
+[class*="avatar"],
+[class*="Avatar"],
+img[class*="avatar"],
+img[class*="profile"] {
+  border-radius: 12px !important;
+  border: 2px solid var(--color-white) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* =============================================================================
+   SUCCESS / CONFIRMATION
+   ============================================================================= */
+
+[class*="success"],
+[class*="Success"],
+[class*="confirmation"],
+[class*="Confirmation"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 2rem !important;
+  text-align: center !important;
+}
+
+/* Success icon */
+[class*="success"] svg,
+[class*="Success"] svg,
+[class*="check-icon"] {
+  color: #10B981 !important;
+}
+
+/* =============================================================================
+   BADGES
+   ============================================================================= */
+
+[class*="badge"],
+[class*="Badge"],
+[class*="tag"],
+[class*="Tag"] {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.375rem 0.75rem !important;
+  border-radius: 9999px !important;
+  background-color: var(--color-eng-blue-05) !important;
+  color: var(--color-eng-blue) !important;
+  border: none !important;
+}
+
+/* =============================================================================
+   MODALS
+   ============================================================================= */
+
+[class*="modal"],
+[class*="Modal"],
+[class*="dialog"],
+[class*="Dialog"],
+[role="dialog"] {
+  background-color: var(--color-white) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--shadow-xl) !important;
+  border: 1px solid var(--color-eng-blue-08) !important;
+}
+
+[class*="overlay"],
+[class*="Overlay"],
+[class*="backdrop"] {
+  background-color: rgba(15, 48, 56, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* =============================================================================
+   NAVIGATION ARROWS
+   ============================================================================= */
+
+[class*="nav-arrow"],
+[class*="NavArrow"],
+[class*="chevron"],
+button[class*="prev"],
+button[class*="next"] {
+  background-color: transparent !important;
+  border: 1px solid var(--color-eng-blue-10) !important;
+  border-radius: 12px !important;
+  color: var(--color-eng-blue) !important;
+  padding: 0.75rem !important;
+  transition: all 0.3s ease !important;
+}
+
+[class*="nav-arrow"]:hover,
+button[class*="prev"]:hover,
+button[class*="next"]:hover {
+  background-color: var(--color-alert-05) !important;
+  border-color: var(--color-alert-30) !important;
+}
+
+/* =============================================================================
+   SCROLLBAR
+   ============================================================================= */
+
+::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-eng-blue-30) !important;
+  border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-eng-blue-60) !important;
+}
+
+/* =============================================================================
+   RESPONSIVIDADE
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  [class*="calendar"],
+  [class*="Calendar"] {
+    border-radius: 16px !important;
+  }
+
+  button,
+  [role="button"] {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  [class*="time-slot"] {
+    padding: 0.75rem 1rem !important;
+  }
+
+  [class*="event-type"],
+  [class*="EventType"] {
+    border-radius: 12px !important;
+  }
+}
