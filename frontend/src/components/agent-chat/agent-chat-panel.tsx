@@ -22,10 +22,10 @@ function getContextLabel(pathname: string): string {
 }
 
 /**
- * Right-side slide-in panel for agent chat.
+ * Right-side slide-in panel for agent chat - Intelligent Flow Design
  * Controlled by isOpen from the Zustand store.
  * w-[420px] on desktop, full-width on mobile.
- * No dark overlay - content remains interactive.
+ * Glassmorphism with smooth transitions.
  */
 export function AgentChatPanel() {
   const isOpen = useAgentChatStore((s) => s.isOpen);
@@ -54,12 +54,12 @@ export function AgentChatPanel() {
     <>
       {/* Panel — bottom sheet on mobile, side panel on desktop */}
       <aside
-        className={`fixed z-sidebar flex flex-col border-graphite bg-white transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`fixed z-sidebar flex flex-col bg-white/95 backdrop-blur-xl transition-transform duration-300 ease-out ${
           // Mobile: bottom sheet
-          "inset-x-0 bottom-0 h-[85vh] rounded-t-xl border-t shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
+          "inset-x-0 bottom-0 h-[85vh] rounded-t-xl border-t border-eng-blue/[0.08] shadow-2xl"
         } ${
           // Desktop: right side panel
-          "md:inset-y-0 md:right-0 md:left-auto md:h-auto md:w-[420px] md:rounded-none md:border-l md:border-t-0 md:shadow-none"
+          "md:inset-y-0 md:right-0 md:left-auto md:h-auto md:w-[420px] md:rounded-none md:border-l md:border-t-0 md:shadow-xl"
         } ${
           isOpen
             ? "translate-y-0 md:translate-x-0 md:translate-y-0"
@@ -69,16 +69,18 @@ export function AgentChatPanel() {
         role="complementary"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-graphite px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Bot className="h-5 w-5 text-ink" />
-            <span className="font-sans text-sm font-semibold uppercase tracking-wide text-ink">
+        <div className="flex items-center justify-between border-b border-eng-blue/[0.06] px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-eng-blue to-[#1A4A55] flex items-center justify-center">
+              <Bot className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-display text-sm font-semibold text-eng-blue tracking-tight">
               MedFlow Agent
             </span>
           </div>
           <button
             onClick={close}
-            className="flex h-7 w-7 items-center justify-center text-ink/60 transition-colors hover:text-ink"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-concrete hover:text-eng-blue hover:bg-eng-blue-05 transition-all duration-300"
             aria-label="Fechar chat"
           >
             <X className="h-4 w-4" />
@@ -86,9 +88,9 @@ export function AgentChatPanel() {
         </div>
 
         {/* Context chip */}
-        <div className="border-b border-graphite/30 px-4 py-2">
-          <span className="inline-flex items-center gap-1.5 border border-graphite bg-paper px-2 py-0.5 font-mono text-label-sm uppercase text-steel">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent-orange" />
+        <div className="border-b border-eng-blue/[0.04] px-4 py-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-alert-05 border border-alert-10 font-mono text-xs text-alert">
+            <span className="h-1.5 w-1.5 rounded-full bg-alert animate-pulse" />
             {getContextLabel(pathname)}
           </span>
         </div>

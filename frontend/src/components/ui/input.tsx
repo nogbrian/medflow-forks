@@ -4,10 +4,10 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Input Industrial
+ * Input - Intelligent Flow Design
  *
- * Campo de entrada com estética de formulário técnico.
- * Bordas pretas, sem border-radius.
+ * Campo de entrada com bordas arredondadas e estados modernos.
+ * Focus com ring sutil e transições suaves.
  */
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -24,7 +24,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block font-mono text-[10px] uppercase text-steel mb-2 tracking-wider"
+            className="block font-sans text-sm font-medium text-eng-blue mb-2"
           >
             {label}
           </label>
@@ -33,20 +33,24 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={type}
           id={inputId}
           className={cn(
-            "flex h-12 w-full bg-white border border-graphite px-4 py-3",
-            "text-ink text-sm placeholder:text-steel",
-            "transition-colors duration-100",
-            "focus:outline-none focus:border-accent-orange focus:ring-0",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-paper",
-            "rounded-none",
-            error && "border-accent-orange",
+            "flex h-12 w-full px-5 py-3",
+            "bg-white/80 backdrop-blur-sm",
+            "border-2 border-eng-blue-10",
+            "rounded-md",
+            "font-sans text-eng-blue text-sm",
+            "placeholder:text-concrete/50",
+            "transition-all duration-300",
+            "hover:border-eng-blue-30",
+            "focus:border-alert focus:ring-4 focus:ring-alert-10 focus:outline-none",
+            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-eng-blue-05",
+            error && "border-alert focus:ring-alert-10",
             className
           )}
           ref={ref}
           {...props}
         />
         {error && (
-          <p className="mt-1.5 font-mono text-[10px] uppercase text-accent-orange tracking-wider">
+          <p className="mt-2 font-sans text-sm text-alert">
             {error}
           </p>
         )}

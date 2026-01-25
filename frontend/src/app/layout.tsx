@@ -1,20 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
 
 /**
- * Font Configuration - Industrial Design System
+ * Font Configuration - Intelligent Flow Design System
  *
- * Inter Tight para headlines (display)
+ * Clash Display para headlines (display) - via Fontshare
+ * Satoshi para body text (sans) - via Fontshare
  * JetBrains Mono para dados e métricas
  */
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
@@ -56,18 +51,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="pt-BR" className={jetbrainsMono.variable}>
       <head>
-        {/* Preconnect to Google Fonts for Inter Tight */}
+        {/* Preconnect to font providers */}
+        <link rel="preconnect" href="https://api.fontshare.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
+        {/* Fontshare - Clash Display (display) & Satoshi (body) */}
         <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
+          href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap"
+          rel="stylesheet"
         />
-        {/* Inter Tight for headlines */}
+
+        {/* Google Fonts - JetBrains Mono (data/metrics) */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
       </head>

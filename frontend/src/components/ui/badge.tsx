@@ -4,9 +4,9 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Badge Industrial
+ * Badge - Intelligent Flow Design
  *
- * Etiqueta técnica com borda e fonte mono.
+ * Pill-style badge com bordas arredondadas e cores suaves.
  */
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -16,11 +16,11 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant = "default", ...props }, ref) => {
     const variants = {
-      default: "bg-white text-ink border-graphite",
-      active: "bg-ink text-white border-ink",
-      warning: "bg-accent-orange text-white border-accent-orange",
-      success: "bg-[#22C55E] text-white border-[#22C55E]",
-      info: "bg-accent-blue text-white border-accent-blue",
+      default: "bg-eng-blue-05 text-eng-blue border-eng-blue-10",
+      active: "bg-eng-blue text-white border-eng-blue",
+      warning: "bg-alert-10 text-alert border-alert-30",
+      success: "bg-green-50 text-green-700 border-green-200",
+      info: "bg-blue-50 text-blue-700 border-blue-200",
     };
 
     return (
@@ -28,9 +28,9 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
         ref={ref}
         className={cn(
           "inline-flex items-center gap-1.5",
-          "border px-2 py-1",
-          "font-mono text-[10px] uppercase tracking-wider",
-          "rounded-none",
+          "border px-3 py-1",
+          "font-mono text-xs font-medium uppercase tracking-wide",
+          "rounded-full",
           variants[variant],
           className
         )}

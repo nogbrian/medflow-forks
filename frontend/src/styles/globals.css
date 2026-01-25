@@ -3,75 +3,96 @@
 @tailwind utilities;
 
 /**
- * MedFlow Industrial Design System
- * Estilo: Industrial / Suíço
+ * MedFlow Intelligent Flow Design System
+ * Estilo: Fluido / Tech-Forward / Premium
  */
-
-/* =========================================
-   FONTS (Google Fonts)
-   ========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* =========================================
    BASE LAYER
    ========================================= */
 @layer base {
   :root {
-    /* Materiais */
-    --color-paper: #F2F0E9;
-    --color-ink: #111111;
-    --color-graphite: #000000;
-    --color-accent-orange: #F24E1E;
-    --color-accent-blue: #0047AB;
-    --color-steel: #666666;
+    /* Brand Colors */
+    --color-eng-blue: #0F3038;
+    --color-alert: #FF6400;
+    --color-concrete: #808080;
+    --color-tech-white: #F5F5F2;
+
+    /* Opacity variants */
+    --color-eng-blue-10: rgba(15, 48, 56, 0.1);
+    --color-eng-blue-05: rgba(15, 48, 56, 0.05);
+    --color-alert-10: rgba(255, 100, 0, 0.1);
+    --color-alert-05: rgba(255, 100, 0, 0.05);
+
+    /* Legacy aliases */
+    --color-paper: #F5F5F2;
+    --color-ink: #0F3038;
+    --color-graphite: rgba(15, 48, 56, 0.1);
+    --color-accent-orange: #FF6400;
+    --color-accent-blue: #0F3038;
+    --color-steel: #808080;
   }
 
   html {
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply bg-paper text-ink font-sans;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+    @apply bg-tech-white text-eng-blue font-sans;
   }
 
   /* Seleção de texto */
   ::selection {
-    @apply bg-accent-orange text-white;
+    @apply bg-alert text-white;
   }
 
-  /* Scrollbar industrial */
+  /* Scrollbar moderna */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-paper;
+    @apply bg-eng-blue-05 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-ink;
+    @apply bg-eng-blue-30 rounded-full;
   }
 
-  /* Focus ring industrial */
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-eng-blue-50;
+  }
+
+  /* Focus ring moderno */
   *:focus-visible {
-    @apply outline-none ring-2 ring-accent-orange ring-offset-2 ring-offset-paper;
+    @apply outline-none ring-4 ring-alert-10 ring-offset-2 ring-offset-tech-white;
   }
 
-  /* Headings */
+  /* Headings - Clash Display */
   h1, h2, h3, h4, h5, h6 {
-    @apply text-balance font-bold tracking-tight;
+    @apply font-display text-balance tracking-tight;
   }
 
-  /* Body text */
+  h1 {
+    @apply text-4xl font-semibold md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl font-semibold md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold md:text-3xl;
+  }
+
+  /* Body text - Satoshi */
   p {
-    @apply text-pretty leading-relaxed;
+    @apply font-sans text-pretty leading-relaxed;
   }
 
-  /* Dados numéricos */
+  /* Dados numéricos - JetBrains Mono */
   [data-numeric], .tabular-nums {
     font-variant-numeric: tabular-nums;
     @apply font-mono;
@@ -82,143 +103,152 @@
    COMPONENT LAYER
    ========================================= */
 @layer components {
-  /* Botão Industrial Primário */
-  .btn-industrial {
+  /* Botão Primário - Intelligent Flow */
+  .btn-primary {
     @apply inline-flex items-center justify-center gap-2;
-    @apply bg-ink text-white border border-ink;
-    @apply px-6 py-3 font-medium text-sm uppercase tracking-wide;
-    @apply shadow-hard-orange;
-    @apply transition-all duration-fast;
-    border-radius: 0;
+    @apply bg-alert text-white;
+    @apply px-8 py-4 rounded-md font-sans font-semibold text-sm;
+    @apply shadow-md shadow-glow-orange;
+    @apply hover:shadow-lg hover:-translate-y-0.5;
+    @apply active:translate-y-0 active:shadow-md;
+    @apply transition-all duration-300;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
   }
 
-  .btn-industrial:hover {
-    @apply bg-accent-orange border-accent-orange;
-  }
-
-  .btn-industrial:active {
-    @apply translate-x-0.5 translate-y-0.5 shadow-hard-orange-active;
-  }
-
-  /* Botão Industrial Secundário */
-  .btn-industrial-secondary {
+  /* Botão Secundário - Intelligent Flow */
+  .btn-secondary {
     @apply inline-flex items-center justify-center gap-2;
-    @apply bg-white text-ink border border-ink;
-    @apply px-6 py-3 font-medium text-sm uppercase tracking-wide;
-    @apply shadow-hard;
-    @apply transition-all duration-fast;
-    border-radius: 0;
-  }
-
-  .btn-industrial-secondary:hover {
-    @apply bg-paper;
-  }
-
-  .btn-industrial-secondary:active {
-    @apply translate-x-0.5 translate-y-0.5 shadow-hard-active;
+    @apply bg-transparent text-eng-blue;
+    @apply border-2 border-eng-blue-30;
+    @apply px-8 py-4 rounded-md font-sans font-semibold text-sm;
+    @apply hover:border-eng-blue hover:bg-eng-blue-05 hover:-translate-y-0.5;
+    @apply active:translate-y-0;
+    @apply transition-all duration-300;
   }
 
   /* Botão Ghost */
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2;
-    @apply bg-transparent text-ink;
-    @apply px-4 py-2 font-medium text-sm uppercase tracking-wide;
-    @apply transition-colors duration-fast;
-    @apply hover:text-accent-orange;
+    @apply bg-transparent text-eng-blue;
+    @apply px-4 py-2 rounded-md font-sans font-medium text-sm;
+    @apply hover:text-alert hover:bg-alert-05;
+    @apply transition-all duration-300;
   }
 
-  /* Card Industrial */
-  .card-industrial {
-    @apply bg-white border border-graphite p-6;
-    @apply relative;
+  /* Card - Glassmorphism */
+  .card {
+    @apply bg-white/80 backdrop-blur-sm;
+    @apply border border-eng-blue/[0.08];
+    @apply rounded-lg p-6;
+    @apply shadow-md;
+    @apply hover:shadow-xl hover:-translate-y-1 hover:border-alert-30;
+    @apply transition-all duration-400;
   }
 
-  /* Card com dobra decorativa */
-  .card-industrial-folded::after {
-    content: "";
-    @apply absolute top-0 right-0;
-    border-width: 0 16px 16px 0;
-    border-style: solid;
-    border-color: var(--color-paper) var(--color-paper) transparent transparent;
+  /* Card sem hover */
+  .card-static {
+    @apply bg-white/80 backdrop-blur-sm;
+    @apply border border-eng-blue/[0.08];
+    @apply rounded-lg p-6;
+    @apply shadow-md;
   }
 
-  /* Input Industrial */
-  .input-industrial {
-    @apply w-full bg-white border border-graphite px-4 py-3;
-    @apply text-ink placeholder:text-steel;
-    @apply transition-colors duration-fast;
-    @apply focus:border-accent-orange focus:ring-0;
-    border-radius: 0;
+  /* Input - Intelligent Flow */
+  .input {
+    @apply w-full px-5 py-4;
+    @apply bg-white/80 backdrop-blur-sm;
+    @apply border-2 border-eng-blue-10;
+    @apply rounded-md;
+    @apply font-sans text-eng-blue;
+    @apply placeholder:text-concrete/50;
+    @apply hover:border-eng-blue-30;
+    @apply focus:border-alert focus:ring-4 focus:ring-alert-10 focus:outline-none;
+    @apply transition-all duration-300;
   }
 
-  /* Label Industrial */
-  .label-industrial {
-    @apply block font-mono text-label-sm uppercase text-steel mb-2;
+  /* Label */
+  .label {
+    @apply block font-sans text-sm font-medium text-eng-blue mb-2;
   }
 
-  /* Badge Industrial */
-  .badge-industrial {
+  /* Badge - Pill style */
+  .badge {
     @apply inline-flex items-center gap-1.5;
-    @apply bg-white border border-graphite px-2 py-1;
-    @apply font-mono text-label-sm uppercase;
+    @apply px-3 py-1 rounded-full;
+    @apply font-mono text-xs font-medium uppercase tracking-wide;
+    @apply bg-eng-blue-05 text-eng-blue border border-eng-blue-10;
   }
 
-  .badge-industrial-active {
-    @apply bg-ink text-white border-ink;
+  .badge-alert {
+    @apply bg-alert-10 text-alert border-alert-30;
   }
 
-  .badge-industrial-warning {
-    @apply bg-accent-orange text-white border-accent-orange;
+  .badge-active {
+    @apply bg-eng-blue text-white border-eng-blue;
   }
 
-  /* Divider */
-  .divider-industrial {
-    @apply border-t border-graphite;
-  }
-
-  /* Estrutura de Grid */
-  .grid-industrial {
-    @apply grid divide-x divide-graphite border-x border-graphite;
-  }
-
-  /* Métrica (número grande) */
+  /* Metric display */
   .metric-value {
-    @apply font-sans text-5xl font-bold tracking-tighter tabular-nums;
+    @apply font-display text-5xl font-semibold tracking-tight tabular-nums;
   }
 
   .metric-label {
-    @apply font-mono text-label-sm uppercase text-steel;
+    @apply font-mono text-xs uppercase text-concrete tracking-wide;
   }
 
-  /* Status indicator */
-  .status-dot {
-    @apply size-2 rounded-none;
-  }
-
-  .status-dot-active {
-    @apply bg-accent-orange;
-  }
-
-  .status-dot-inactive {
-    @apply bg-steel;
-  }
-
-  /* Table Industrial */
-  .table-industrial {
+  /* Table */
+  .table {
     @apply w-full border-collapse;
   }
 
+  .table th {
+    @apply text-left font-mono text-xs uppercase text-concrete tracking-wide;
+    @apply px-4 py-3 border-b border-eng-blue-10 bg-eng-blue-05;
+  }
+
+  .table td {
+    @apply px-4 py-3 border-b border-eng-blue/[0.06];
+  }
+
+  .table tr:hover td {
+    @apply bg-eng-blue-05;
+  }
+
+  /* Legacy component aliases */
+  .btn-industrial {
+    @apply btn-primary;
+  }
+
+  .btn-industrial-secondary {
+    @apply btn-secondary;
+  }
+
+  .card-industrial {
+    @apply card-static;
+  }
+
+  .input-industrial {
+    @apply input;
+  }
+
+  .badge-industrial {
+    @apply badge;
+  }
+
+  .label-industrial {
+    @apply label font-mono text-xs uppercase text-concrete;
+  }
+
+  .table-industrial {
+    @apply table;
+  }
+
   .table-industrial th {
-    @apply text-left font-mono text-label-sm uppercase text-steel;
-    @apply px-4 py-3 border-b border-graphite bg-paper;
+    @apply text-left font-mono text-xs uppercase text-concrete tracking-wide px-4 py-3 border-b border-eng-blue-10 bg-eng-blue-05;
   }
 
   .table-industrial td {
-    @apply px-4 py-3 border-b border-graphite;
-  }
-
-  .table-industrial tr:hover td {
-    @apply bg-paper/50;
+    @apply px-4 py-3 border-b border-eng-blue/[0.06];
   }
 }
 
@@ -226,32 +256,87 @@
    UTILITY LAYER
    ========================================= */
 @layer utilities {
-  /* Tracking customizado para títulos */
-  .tracking-tighter-industrial {
-    letter-spacing: -0.04em;
-  }
-
-  /* Texto monoespaçado para dados */
+  /* Text utilities */
   .text-data {
     @apply font-mono tabular-nums;
   }
 
-  /* Container com borda estrutural */
-  .border-structure {
-    @apply border border-graphite;
+  /* Animation utilities */
+  .animate-delay-100 {
+    animation-delay: 0.1s;
+  }
+  .animate-delay-200 {
+    animation-delay: 0.2s;
+  }
+  .animate-delay-300 {
+    animation-delay: 0.3s;
+  }
+  .animate-delay-400 {
+    animation-delay: 0.4s;
   }
 
-  /* Animação de hover sutil */
+  /* Animation fill mode */
+  .animate-fill-both {
+    animation-fill-mode: both;
+  }
+
+  /* Hover lift */
   .hover-lift {
-    @apply transition-transform duration-fast;
+    @apply transition-all duration-300;
   }
 
   .hover-lift:hover {
-    @apply -translate-y-0.5;
+    @apply -translate-y-1 shadow-lg;
   }
 
-  /* Grid pattern background */
-  .bg-grid {
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Cpath d='M0 0h40v1H0zM0 0h1v40H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  /* Glassmorphism backgrounds */
+  .glass {
+    @apply bg-white/80 backdrop-blur-sm;
+  }
+
+  .glass-strong {
+    @apply bg-white/95 backdrop-blur-xl;
+  }
+
+  /* Gradient line */
+  .gradient-line {
+    @apply h-px bg-gradient-to-r from-transparent via-alert to-transparent;
+  }
+
+  /* Grid pattern with mask */
+  .bg-grid-masked {
+    background-image:
+      linear-gradient(to right, rgba(15,48,56,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15,48,56,0.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 100% 80% at center, black 20%, transparent 80%);
+  }
+
+  /* Status dots */
+  .status-dot {
+    @apply size-2 rounded-full;
+  }
+
+  .status-dot-active {
+    @apply bg-alert;
+  }
+
+  .status-dot-inactive {
+    @apply bg-concrete;
+  }
+
+  /* Underline animation for nav links */
+  .nav-underline {
+    @apply absolute -bottom-1 left-0 w-0 h-0.5 bg-alert rounded-full transition-all duration-300;
+  }
+
+  .group:hover .nav-underline,
+  .nav-underline-active {
+    @apply w-full;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-eng-blue-10;
   }
 }

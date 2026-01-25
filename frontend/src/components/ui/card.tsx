@@ -4,39 +4,32 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Card Industrial
+ * Card - Intelligent Flow Design
  *
- * Ficha técnica com borda preta e fundo branco.
- * Opção de "dobra" decorativa no canto.
+ * Glassmorphism sutil com bordas arredondadas.
+ * Hover com lift e sombra aumentada.
  */
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  folded?: boolean;
+  hoverable?: boolean;
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, folded = false, children, ...props }, ref) => {
+  ({ className, hoverable = true, children, ...props }, ref) => {
     return (
       <div
         ref={ref}
         className={cn(
-          "bg-white border border-graphite p-6 relative",
-          folded && "card-industrial-folded",
+          "bg-white/80 backdrop-blur-sm",
+          "border border-eng-blue/[0.08]",
+          "rounded-lg p-6",
+          "shadow-md",
+          hoverable && "hover:shadow-xl hover:-translate-y-1 hover:border-alert-30 transition-all duration-300",
           className
         )}
         {...props}
       >
         {children}
-        {folded && (
-          <div
-            className="absolute top-0 right-0 w-0 h-0"
-            style={{
-              borderWidth: "0 16px 16px 0",
-              borderStyle: "solid",
-              borderColor: "#F2F0E9 #F2F0E9 transparent transparent",
-            }}
-          />
-        )}
       </div>
     );
   }
@@ -50,7 +43,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 pb-4 border-b border-graphite mb-4", className)}
+    className={cn("flex flex-col space-y-1.5 pb-4 border-b border-eng-blue-10 mb-4", className)}
     {...props}
   />
 ));
@@ -62,7 +55,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("font-bold text-lg tracking-tight uppercase", className)}
+    className={cn("font-display font-semibold text-lg tracking-tight", className)}
     {...props}
   />
 ));
@@ -74,7 +67,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-steel", className)}
+    className={cn("text-sm text-concrete font-sans", className)}
     {...props}
   />
 ));
@@ -94,7 +87,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center pt-4 border-t border-graphite mt-4", className)}
+    className={cn("flex items-center pt-4 border-t border-eng-blue-10 mt-4", className)}
     {...props}
   />
 ));

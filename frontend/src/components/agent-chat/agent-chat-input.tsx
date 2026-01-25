@@ -13,7 +13,7 @@ const MAX_ROWS = 4;
 const LINE_HEIGHT = 20; // px per line
 
 /**
- * Auto-resizing chat input with Enter-to-send.
+ * Auto-resizing chat input with Enter-to-send - Intelligent Flow Design
  * Disables input and shows spinner while streaming.
  */
 export function AgentChatInput({ onSend }: AgentChatInputProps) {
@@ -55,7 +55,7 @@ export function AgentChatInput({ onSend }: AgentChatInputProps) {
   );
 
   return (
-    <div className="flex items-end gap-2 border-t border-graphite bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="flex items-end gap-2 border-t border-eng-blue/[0.06] bg-white/80 backdrop-blur-sm p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <textarea
         ref={textareaRef}
         rows={MIN_ROWS}
@@ -63,13 +63,13 @@ export function AgentChatInput({ onSend }: AgentChatInputProps) {
         disabled={isStreaming}
         onInput={resize}
         onKeyDown={handleKeyDown}
-        className="flex-1 resize-none border border-graphite bg-paper px-3 py-2 text-sm text-ink placeholder:text-steel outline-none focus:border-ink disabled:opacity-50"
+        className="flex-1 resize-none border-2 border-eng-blue-10 bg-white/80 rounded-md px-4 py-2.5 text-sm font-sans text-eng-blue placeholder:text-concrete/50 outline-none focus:border-alert focus:ring-4 focus:ring-alert-10 disabled:opacity-50 transition-all duration-300"
         style={{ lineHeight: `${LINE_HEIGHT}px`, maxHeight: `${LINE_HEIGHT * MAX_ROWS}px` }}
       />
       <button
         onClick={handleSend}
         disabled={isStreaming}
-        className="flex h-9 w-9 shrink-0 items-center justify-center border border-graphite bg-ink text-white transition-colors hover:bg-accent-orange disabled:opacity-50"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-alert text-white shadow-md shadow-glow-orange transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
         aria-label="Enviar mensagem"
       >
         {isStreaming ? (

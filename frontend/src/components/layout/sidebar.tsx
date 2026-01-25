@@ -20,10 +20,10 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
 
 /**
- * Sidebar Industrial
+ * Sidebar - Intelligent Flow Design
  *
- * Navegação lateral com grid exposto.
- * Links organizados por seção.
+ * Navegação lateral com glassmorphism e transições suaves.
+ * Links com hover lift e indicador de página ativa.
  */
 
 interface SidebarProps {
@@ -102,10 +102,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay with blur */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-ink/50 z-sidebar lg:hidden"
+          className="fixed inset-0 bg-eng-blue/60 backdrop-blur-sm z-sidebar lg:hidden"
           onClick={onClose}
         />
       )}
@@ -115,9 +115,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         className={cn(
           "fixed top-16 left-0 z-sidebar",
           "w-64 h-[calc(100dvh-4rem)]",
-          "bg-paper border-r border-graphite",
+          "bg-white/95 backdrop-blur-xl",
+          "border-r border-eng-blue/[0.06]",
           "overflow-y-auto",
-          "transition-transform duration-150 ease-out",
+          "transition-transform duration-300 ease-out",
           // Mobile: slide in/out
           "lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
@@ -126,7 +127,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Mobile Close */}
         <button
           onClick={onClose}
-          className="lg:hidden absolute top-4 right-4 p-2 hover:text-accent-orange"
+          className="lg:hidden absolute top-4 right-4 p-2 rounded-md hover:bg-eng-blue-05 hover:text-alert transition-all duration-300"
           aria-label="Fechar menu"
         >
           <X size={20} />
@@ -137,12 +138,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           {navigation.map((section) => (
             <div key={section.title} className="mb-6">
               {/* Section Title */}
-              <h3 className="px-6 mb-2 font-mono text-[10px] uppercase text-steel tracking-wider">
+              <h3 className="px-6 mb-2 font-mono text-[10px] uppercase text-concrete tracking-wider">
                 {section.title}
               </h3>
 
               {/* Section Items */}
-              <ul>
+              <ul className="space-y-1">
                 {section.items.map((item) => {
                   const isExternal = item.href.startsWith("http");
                   const isActive = !isExternal && (
@@ -151,13 +152,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   );
                   const Icon = item.icon;
                   const linkClass = cn(
-                    "flex items-center gap-3 px-6 py-2.5",
-                    "text-sm font-medium",
-                    "border-l-2 border-transparent",
-                    "transition-colors duration-100",
+                    "flex items-center gap-3 mx-3 px-3 py-2.5",
+                    "text-sm font-sans font-medium",
+                    "rounded-md",
+                    "transition-all duration-300",
                     isActive
-                      ? "bg-white text-ink border-l-accent-orange"
-                      : "hover:bg-white hover:border-l-steel"
+                      ? "bg-alert-10 text-alert"
+                      : "hover:bg-eng-blue-05 text-eng-blue"
                   );
 
                   return (
@@ -177,7 +178,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           onClick={onClose}
                           className={linkClass}
                         >
-                          <Icon size={16} className={isActive ? "text-accent-orange" : ""} />
+                          <Icon size={16} className={isActive ? "text-alert" : ""} />
                           {item.label}
                         </Link>
                       )}
@@ -190,20 +191,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* Footer - User & Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-graphite bg-white">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-eng-blue-10 bg-white/80 backdrop-blur-sm">
           {user && (
             <div className="flex items-center justify-between">
               <div className="min-w-0">
-                <span className="block text-xs font-medium truncate">
+                <span className="block text-sm font-sans font-medium text-eng-blue truncate">
                   {user.name}
                 </span>
-                <span className="block font-mono text-[10px] text-steel truncate">
+                <span className="block font-mono text-[10px] text-concrete truncate">
                   {user.email}
                 </span>
               </div>
               <button
                 onClick={logout}
-                className="p-2 text-steel hover:text-red-600 transition-colors flex-shrink-0"
+                className="p-2 rounded-md text-concrete hover:text-red-600 hover:bg-red-50 transition-all duration-300 flex-shrink-0"
                 aria-label="Sair"
                 title="Sair"
               >

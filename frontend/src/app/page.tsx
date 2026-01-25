@@ -10,6 +10,7 @@ import {
   Target,
   Clock,
   RefreshCw,
+  Sparkles,
 } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -28,11 +29,10 @@ import { useDashboardMetrics, useRecentLeads, useUpcomingBookings } from "@/hook
 import { formatDate, formatCurrency } from "@/lib/utils";
 
 /**
- * Dashboard Principal
+ * Dashboard Principal - Intelligent Flow Design
  *
  * Visão geral do sistema com métricas e atividades recentes.
- * Dados vêm do backend via API proxy routes.
- * Fallback para estados vazios quando API está indisponível.
+ * Design moderno com glassmorphism, gradients e animações.
  */
 
 function getLeadName(lead: { name?: { firstName?: string; lastName?: string } }): string {
@@ -51,25 +51,67 @@ export default function DashboardPage() {
 
   return (
     <Shell>
-      {/* Page Header */}
-      <div className="border-b border-graphite bg-white">
-        <div className="px-6 lg:px-8 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* Hero Section with Mesh Gradient */}
+      <div className="relative overflow-hidden border-b border-eng-blue/[0.06] bg-gradient-to-br from-tech-white to-white">
+        {/* Mesh Gradient Background */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(ellipse 80% 50% at 20% -10%, rgba(255,100,0,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse 60% 40% at 85% 110%, rgba(15,48,56,0.06) 0%, transparent 50%)
+            `
+          }}
+        />
+
+        {/* Grid Pattern */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(15,48,56,0.03) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(15,48,56,0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: '80px 80px',
+            maskImage: 'radial-gradient(ellipse 100% 80% at center, black 20%, transparent 80%)'
+          }}
+        />
+
+        {/* Floating Blobs */}
+        <div className="absolute top-[10%] right-[-5%] w-[300px] h-[300px] rounded-full bg-alert/[0.06] blur-[100px] animate-float" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[200px] h-[200px] rounded-full bg-eng-blue/[0.04] blur-[80px] animate-float" style={{ animationDelay: '-3s' }} />
+
+        {/* Content */}
+        <div className="relative z-10 px-6 lg:px-8 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold tracking-tight uppercase">
+            {/* Tag Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-alert/[0.08] rounded-full mb-4 animate-fade-in-up animate-fill-both">
+              <Sparkles className="w-4 h-4 text-alert" />
+              <span className="text-xs font-mono font-medium tracking-wide text-alert uppercase">
+                IA + Marketing Médico
+              </span>
+            </div>
+
+            {/* Title with highlight */}
+            <h1 className="font-display text-3xl md:text-4xl font-semibold text-eng-blue tracking-tight mb-2 animate-fade-in-up animate-fill-both animate-delay-100">
+              <span className="relative inline-block">
                 Dashboard
-              </h1>
-              <Badge variant="active">
-                <span className="size-1.5 bg-[#22C55E]" />
+                <span className="absolute bottom-[0.1em] left-0 right-0 h-[0.15em] bg-alert/25 rounded-sm -z-10" />
+              </span>
+            </h1>
+
+            <div className="flex items-center gap-3 animate-fade-in-up animate-fill-both animate-delay-200">
+              <Badge variant="success">
+                <span className="size-1.5 rounded-full bg-green-500 animate-pulse" />
                 Live
               </Badge>
+              <p className="font-mono text-sm text-concrete">
+                Última atualização: {now}
+              </p>
             </div>
-            <p className="font-mono text-sm text-steel">
-              ÚLTIMA_ATUALIZAÇÃO: {now}
-            </p>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 animate-fade-in-up animate-fill-both animate-delay-300">
             <Button
               variant="secondary"
               size="sm"
@@ -87,7 +129,7 @@ export default function DashboardPage() {
 
       {/* Metrics Grid */}
       <div className="p-6 lg:p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-graphite border border-graphite">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Metric
             label="Leads (Mês)"
             value={metricsLoading ? "—" : `+${metrics?.leads_total ?? 0}`}
@@ -115,7 +157,7 @@ export default function DashboardPage() {
       <div className="px-6 lg:px-8 pb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Leads */}
         <div className="lg:col-span-2">
-          <Card>
+          <Card hoverable={false}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Leads Recentes</CardTitle>
@@ -127,12 +169,12 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               {leadsLoading ? (
-                <p className="text-sm text-steel py-8 text-center font-mono">
-                  CARREGANDO...
+                <p className="text-sm text-concrete py-8 text-center font-sans">
+                  Carregando...
                 </p>
               ) : leads.length === 0 ? (
-                <p className="text-sm text-steel py-8 text-center font-mono">
-                  NENHUM LEAD ENCONTRADO
+                <p className="text-sm text-concrete py-8 text-center font-sans">
+                  Nenhum lead encontrado
                 </p>
               ) : (
                 <Table>
@@ -147,20 +189,20 @@ export default function DashboardPage() {
                   <TableBody>
                     {leads.slice(0, 8).map((lead, idx) => (
                       <TableRow key={lead.id || idx}>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-sans font-medium">
                           {getLeadName(lead)}
                         </TableCell>
-                        <TableCell className="font-mono text-xs text-steel">
+                        <TableCell className="font-mono text-xs text-concrete">
                           {lead.phones?.primaryPhoneNumber || "—"}
                         </TableCell>
-                        <TableCell className="text-steel text-sm">
+                        <TableCell className="text-concrete text-sm font-sans">
                           {lead.emails?.primaryEmail || "—"}
                         </TableCell>
                         <TableCell>
                           {lead.stage ? (
                             <Badge variant="info">{lead.stage}</Badge>
                           ) : (
-                            <span className="text-steel">—</span>
+                            <span className="text-concrete">—</span>
                           )}
                         </TableCell>
                       </TableRow>
@@ -174,7 +216,7 @@ export default function DashboardPage() {
 
         {/* Upcoming Appointments */}
         <div>
-          <Card folded>
+          <Card hoverable={false}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Agenda Hoje</CardTitle>
@@ -186,12 +228,12 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               {bookingsLoading ? (
-                <p className="text-sm text-steel py-4 text-center font-mono">
-                  CARREGANDO...
+                <p className="text-sm text-concrete py-4 text-center font-sans">
+                  Carregando...
                 </p>
               ) : bookings.length === 0 ? (
-                <p className="text-sm text-steel py-4 text-center font-mono">
-                  NENHUMA CONSULTA HOJE
+                <p className="text-sm text-concrete py-4 text-center font-sans">
+                  Nenhuma consulta hoje
                 </p>
               ) : (
                 <div className="space-y-4">
@@ -207,16 +249,16 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={booking.uid || idx}
-                        className="flex items-start gap-4 pb-4 border-b border-graphite last:border-0 last:pb-0"
+                        className="flex items-start gap-4 pb-4 border-b border-eng-blue-10 last:border-0 last:pb-0"
                       >
-                        <div className="bg-ink text-white px-3 py-2 text-center min-w-[60px]">
+                        <div className="bg-eng-blue text-white px-3 py-2 text-center min-w-[60px] rounded-md">
                           <span className="font-mono text-sm font-bold">
                             {time}
                           </span>
                         </div>
                         <div className="flex-1">
-                          <p className="font-medium">{attendee}</p>
-                          <p className="text-sm text-steel">
+                          <p className="font-sans font-medium text-eng-blue">{attendee}</p>
+                          <p className="text-sm text-concrete font-sans">
                             {booking.titulo || "Consulta"} • {booking.status || "CONFIRMED"}
                           </p>
                         </div>
@@ -228,7 +270,7 @@ export default function DashboardPage() {
 
               <a
                 href="/agenda"
-                className="block w-full mt-6 px-6 py-3 text-center text-sm font-medium uppercase tracking-wider border border-graphite bg-white text-ink shadow-hard hover:bg-paper transition-all duration-100"
+                className="block w-full mt-6 px-6 py-3 text-center text-sm font-sans font-semibold rounded-md border-2 border-eng-blue-30 bg-white text-eng-blue hover:border-eng-blue hover:bg-eng-blue-05 hover:-translate-y-0.5 transition-all duration-300"
               >
                 Ver Agenda Completa
               </a>
@@ -236,20 +278,20 @@ export default function DashboardPage() {
           </Card>
 
           {/* Quick Stats */}
-          <Card className="mt-6 bg-ink text-white">
+          <Card className="mt-6 bg-gradient-to-br from-eng-blue to-[#1A4A55] text-white" hoverable={false}>
             <CardContent className="py-6">
               <div className="flex items-center gap-4 mb-4">
-                <BarChart3 size={24} className="text-accent-orange" />
+                <BarChart3 size={24} className="text-alert" />
                 <div>
                   <p className="font-mono text-[10px] uppercase text-white/60">
                     Conversão
                   </p>
-                  <p className="text-3xl font-bold tabular-nums">
+                  <p className="text-3xl font-display font-semibold tabular-nums">
                     {metricsLoading ? "—" : `${metrics?.conversion_rate ?? 0}%`}
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-white/60">
+              <p className="text-sm text-white/60 font-sans">
                 Taxa de conversão leads → consultas agendadas.
               </p>
             </CardContent>

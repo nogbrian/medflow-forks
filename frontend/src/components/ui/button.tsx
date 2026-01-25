@@ -4,13 +4,13 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Button Industrial
+ * Button - Intelligent Flow Design
  *
  * Variantes:
- * - primary: Fundo preto, sombra laranja
- * - secondary: Fundo branco, sombra preta
- * - ghost: Sem fundo, sem sombra
- * - danger: Fundo laranja
+ * - primary: Fundo alert, sombra glow laranja, hover lift
+ * - secondary: Borda eng-blue, hover lift
+ * - ghost: Sem fundo, hover com background sutil
+ * - danger: Fundo alert mais escuro
  */
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -23,40 +23,41 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
     const baseStyles = cn(
       "inline-flex items-center justify-center gap-2",
-      "font-medium uppercase tracking-wide",
-      "transition-all duration-100 ease-out",
-      "disabled:opacity-50 disabled:pointer-events-none",
-      // Sem border-radius
-      "rounded-none"
+      "font-sans font-semibold",
+      "transition-all duration-300 ease-out",
+      "disabled:opacity-50 disabled:pointer-events-none disabled:transform-none",
+      // Rounded corners - Intelligent Flow
+      "rounded-md"
     );
 
     const variants = {
       primary: cn(
-        "bg-ink text-white border border-ink",
-        "shadow-[4px_4px_0px_0px_#F24E1E]",
-        "hover:bg-accent-orange hover:border-accent-orange",
-        "active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_#F24E1E]"
+        "bg-alert text-white",
+        "shadow-md shadow-glow-orange",
+        "hover:shadow-lg hover:-translate-y-0.5",
+        "active:translate-y-0 active:shadow-md"
       ),
       secondary: cn(
-        "bg-white text-ink border border-graphite",
-        "shadow-[4px_4px_0px_0px_#000000]",
-        "hover:bg-paper",
-        "active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_#000000]"
+        "bg-transparent text-eng-blue",
+        "border-2 border-eng-blue-30",
+        "hover:border-eng-blue hover:bg-eng-blue-05 hover:-translate-y-0.5",
+        "active:translate-y-0"
       ),
       ghost: cn(
-        "bg-transparent text-ink border-none",
-        "hover:text-accent-orange"
+        "bg-transparent text-eng-blue",
+        "hover:text-alert hover:bg-alert-05",
+        "rounded-md"
       ),
       danger: cn(
-        "bg-accent-orange text-white border border-accent-orange",
-        "shadow-[4px_4px_0px_0px_#000000]",
-        "hover:bg-[#D9451B]",
-        "active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_#000000]"
+        "bg-red-600 text-white",
+        "shadow-md",
+        "hover:bg-red-700 hover:-translate-y-0.5",
+        "active:translate-y-0"
       ),
     };
 
     const sizes = {
-      sm: "px-3 py-1.5 text-xs",
+      sm: "px-4 py-2 text-xs",
       md: "px-6 py-3 text-sm",
       lg: "px-8 py-4 text-base",
     };
@@ -70,8 +71,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {isLoading ? (
           <>
-            <span className="size-4 border-2 border-current border-t-transparent animate-spin" />
-            PROCESSANDO...
+            <span className="size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            Processando...
           </>
         ) : (
           children

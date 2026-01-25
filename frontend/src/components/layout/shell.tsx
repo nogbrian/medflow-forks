@@ -9,9 +9,10 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { AgentChatFab, AgentChatPanel } from "@/components/agent-chat";
 
 /**
- * Shell Layout Industrial
+ * Shell Layout - Intelligent Flow Design
  *
  * Layout principal com Header fixo e Sidebar.
+ * Glassmorphism e transições suaves.
  * Redireciona para /login se não autenticado.
  */
 
@@ -32,10 +33,10 @@ export function Shell({ children }: ShellProps) {
 
   if (loading) {
     return (
-      <div className="min-h-dvh bg-paper bg-grid flex items-center justify-center">
+      <div className="min-h-dvh bg-tech-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-ink/20 border-t-ink rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-xs font-mono text-steel uppercase tracking-widest">
+          <div className="w-10 h-10 border-2 border-eng-blue/20 border-t-alert rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm font-sans text-concrete">
             Carregando...
           </p>
         </div>
@@ -46,7 +47,7 @@ export function Shell({ children }: ShellProps) {
   if (!user) return null;
 
   return (
-    <div className="min-h-dvh bg-paper">
+    <div className="min-h-dvh bg-tech-white">
       <Header onMenuClick={() => setSidebarOpen(true)} />
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -54,8 +55,7 @@ export function Shell({ children }: ShellProps) {
       <main
         className={cn(
           "lg:ml-64",
-          "min-h-[calc(100dvh-4rem)]",
-          "bg-grid"
+          "min-h-[calc(100dvh-4rem)]"
         )}
       >
         <div className="max-w-[1920px] mx-auto">

@@ -25,13 +25,13 @@ function MessageBubble({ message }: MessageBubbleProps) {
       className={`flex w-full ${isUser ? "justify-end" : "justify-start"} animate-fade-in`}
     >
       <div
-        className={`max-w-[85%] whitespace-pre-wrap px-3 py-2 text-sm ${
+        className={`max-w-[85%] whitespace-pre-wrap px-4 py-3 text-sm rounded-lg ${
           isUser
-            ? "bg-ink text-white"
-            : "border border-graphite bg-paper text-ink"
+            ? "bg-eng-blue text-white"
+            : "bg-eng-blue-05 text-eng-blue border border-eng-blue/[0.08]"
         }`}
       >
-        {message.content}
+        <span className="font-sans">{message.content}</span>
 
         {message.tool_calls && message.tool_calls.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
@@ -69,8 +69,10 @@ export function AgentChatMessages({ onSuggestionClick }: AgentChatMessagesProps)
   if (messages.length === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 p-4 md:p-6">
-        <Sparkles className="h-8 w-8 text-ink/30" />
-        <p className="text-center text-sm text-ink/50">
+        <div className="w-12 h-12 rounded-full bg-alert-10 flex items-center justify-center">
+          <Sparkles className="h-6 w-6 text-alert" />
+        </div>
+        <p className="text-center text-sm text-concrete font-sans">
           Como posso ajudar com seu marketing médico?
         </p>
         <div className="flex flex-wrap justify-center gap-2">
@@ -78,7 +80,7 @@ export function AgentChatMessages({ onSuggestionClick }: AgentChatMessagesProps)
             <button
               key={s}
               onClick={() => onSuggestionClick?.(s)}
-              className="border border-graphite bg-white px-3 py-1.5 text-xs text-ink transition-colors hover:bg-paper"
+              className="border border-eng-blue-10 bg-white px-3 py-1.5 rounded-full text-xs font-sans text-eng-blue transition-all duration-300 hover:bg-eng-blue-05 hover:border-eng-blue-30 hover:-translate-y-0.5"
             >
               {s}
             </button>
@@ -96,7 +98,7 @@ export function AgentChatMessages({ onSuggestionClick }: AgentChatMessagesProps)
 
       {pendingToolCalls.length > 0 && (
         <div className="flex justify-start">
-          <div className="flex flex-wrap gap-1 border border-graphite bg-paper px-3 py-2">
+          <div className="flex flex-wrap gap-1 bg-eng-blue-05 border border-eng-blue/[0.08] rounded-lg px-3 py-2">
             {pendingToolCalls.map((tc) => (
               <AgentToolChip key={tc.id} toolCall={tc} />
             ))}
@@ -106,10 +108,10 @@ export function AgentChatMessages({ onSuggestionClick }: AgentChatMessagesProps)
 
       {isStreaming && (
         <div className="flex justify-start">
-          <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-ink/50">
-            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-ink/40" />
-            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-ink/40 [animation-delay:150ms]" />
-            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-ink/40 [animation-delay:300ms]" />
+          <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-concrete">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-alert" />
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-alert [animation-delay:150ms]" />
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-alert [animation-delay:300ms]" />
           </span>
         </div>
       )}
