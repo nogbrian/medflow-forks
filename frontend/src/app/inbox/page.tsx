@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Maximize2, RefreshCw } from "lucide-react";
+import { ExternalLink, Maximize2, RefreshCw, MessageSquare } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,13 +19,18 @@ export default function InboxPage() {
 
   return (
     <Shell>
-      {/* Service Header */}
-      <div className="border-b border-graphite bg-white">
+      {/* Service Header - Intelligent Flow Design */}
+      <div className="border-b border-eng-blue/[0.06] bg-white/80 backdrop-blur-sm">
         <div className="px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold tracking-tight uppercase">
-              Inbox
-            </h1>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-eng-blue to-[#1A4A55] flex items-center justify-center shadow-sm">
+                <MessageSquare className="h-4 w-4 text-white" />
+              </div>
+              <h1 className="font-display text-lg font-semibold text-eng-blue tracking-tight">
+                Inbox
+              </h1>
+            </div>
             <Badge variant="info">
               Chatwoot
             </Badge>
@@ -70,7 +75,7 @@ export default function InboxPage() {
       </div>
 
       {/* Iframe Container */}
-      <div className="h-[calc(100dvh-8rem)] bg-white border-x border-graphite">
+      <div className="h-[calc(100dvh-8rem)] bg-tech-white">
         {!loading && iframeSrc ? (
           <iframe
             id="inbox-frame"
@@ -81,7 +86,7 @@ export default function InboxPage() {
           />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <span className="size-6 border-2 border-ink border-t-transparent animate-spin" />
+            <div className="w-8 h-8 border-3 border-eng-blue/20 border-t-alert rounded-full animate-spin" />
           </div>
         )}
       </div>

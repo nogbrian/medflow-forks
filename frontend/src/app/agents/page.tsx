@@ -244,11 +244,13 @@ export default function AgentsPage() {
   return (
     <Shell>
       <div className="flex flex-col h-[calc(100dvh-4rem)]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-graphite bg-white">
+        {/* Header - Intelligent Flow Design */}
+        <div className="flex items-center justify-between px-6 py-3 border-b border-eng-blue/[0.06] bg-white/80 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <Bot size={20} className="text-accent-orange" />
-            <h1 className="font-mono text-sm font-semibold uppercase tracking-wider">
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-eng-blue to-[#1A4A55] flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-white" />
+            </div>
+            <h1 className="font-display text-lg font-semibold text-eng-blue tracking-tight">
               Agent Playground
             </h1>
           </div>
@@ -258,13 +260,13 @@ export default function AgentsPage() {
             <div className="relative">
               <button
                 onClick={() => setShowAgentPicker(!showAgentPicker)}
-                className="flex items-center gap-2 px-3 py-1.5 border border-graphite text-xs font-mono uppercase tracking-wider hover:bg-paper transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 border-2 border-eng-blue-10 rounded-md text-xs font-sans font-medium text-eng-blue hover:bg-eng-blue-05 transition-all duration-300"
               >
                 {AGENT_TYPES.find((a) => a.id === agentType)?.label || "Geral"}
                 <ChevronDown size={12} />
               </button>
               {showAgentPicker && (
-                <div className="absolute right-0 top-full mt-1 bg-white border border-graphite shadow-hard-sm z-dropdown min-w-[200px]">
+                <div className="absolute right-0 top-full mt-2 bg-white/95 backdrop-blur-xl border border-eng-blue/[0.08] rounded-lg shadow-lg z-dropdown min-w-[200px] overflow-hidden">
                   {AGENT_TYPES.map((agent) => (
                     <button
                       key={agent.id}
@@ -272,12 +274,12 @@ export default function AgentsPage() {
                         setAgentType(agent.id);
                         setShowAgentPicker(false);
                       }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-paper transition-colors ${
-                        agentType === agent.id ? "bg-paper border-l-2 border-l-accent-orange" : ""
+                      className={`w-full text-left px-4 py-2.5 text-sm font-sans hover:bg-eng-blue-05 transition-all duration-300 ${
+                        agentType === agent.id ? "bg-alert-05 border-l-2 border-l-alert text-alert" : "text-eng-blue"
                       }`}
                     >
                       <span className="font-medium">{agent.label}</span>
-                      <span className="block text-xs text-steel">{agent.description}</span>
+                      <span className="block text-xs text-concrete">{agent.description}</span>
                     </button>
                   ))}
                 </div>
@@ -286,10 +288,10 @@ export default function AgentsPage() {
 
             {/* Usage Display */}
             {sessionUsage && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-paper text-xs font-mono text-steel">
-                <DollarSign size={10} />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-eng-blue-05 rounded-md text-xs font-mono text-eng-blue">
+                <DollarSign size={10} className="text-alert" />
                 <span>${sessionUsage.total_cost_usd.toFixed(4)}</span>
-                <span className="text-graphite/30">|</span>
+                <span className="text-concrete">|</span>
                 <span>{sessionUsage.total_input_tokens + sessionUsage.total_output_tokens} tok</span>
               </div>
             )}
@@ -297,7 +299,7 @@ export default function AgentsPage() {
             {/* Reset */}
             <button
               onClick={handleReset}
-              className="p-1.5 text-steel hover:text-accent-orange transition-colors"
+              className="p-2 rounded-md text-concrete hover:text-alert hover:bg-alert-05 transition-all duration-300"
               title="Nova conversa"
             >
               <RotateCcw size={14} />
@@ -306,14 +308,16 @@ export default function AgentsPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-tech-white">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <Bot size={48} className="text-steel/30 mb-4" />
-              <p className="text-sm text-steel">
-                Envie uma mensagem para testar o agente <strong>{AGENT_TYPES.find((a) => a.id === agentType)?.label}</strong>.
+              <div className="w-16 h-16 rounded-full bg-alert-10 flex items-center justify-center mb-4">
+                <Bot size={32} className="text-alert" />
+              </div>
+              <p className="text-sm text-eng-blue font-sans">
+                Envie uma mensagem para testar o agente <strong className="text-alert">{AGENT_TYPES.find((a) => a.id === agentType)?.label}</strong>.
               </p>
-              <p className="text-xs text-steel/60 mt-1">
+              <p className="text-xs text-concrete mt-2 font-sans">
                 Streaming SSE com visibilidade de tools e custo por mensagem.
               </p>
             </div>
@@ -322,21 +326,21 @@ export default function AgentsPage() {
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
             >
               <div
-                className={`max-w-[75%] ${
+                className={`max-w-[75%] rounded-lg ${
                   msg.role === "user"
-                    ? "bg-ink text-white px-4 py-2.5"
-                    : "bg-white border border-graphite px-4 py-2.5"
+                    ? "bg-eng-blue text-white px-4 py-3"
+                    : "bg-white border border-eng-blue/[0.08] px-4 py-3 shadow-sm"
                 }`}
               >
                 {/* Content */}
-                <p className="text-sm whitespace-pre-wrap break-words">
+                <p className="text-sm font-sans whitespace-pre-wrap break-words">
                   {msg.content}
                   {msg.role === "assistant" && loading && msg.id === messages[messages.length - 1]?.id && !msg.content && (
-                    <span className="inline-flex items-center gap-1 text-steel">
-                      <Loader2 size={12} className="animate-spin" />
+                    <span className="inline-flex items-center gap-1.5 text-concrete">
+                      <Loader2 size={12} className="animate-spin text-alert" />
                       <span className="text-xs">pensando...</span>
                     </span>
                   )}
@@ -344,18 +348,18 @@ export default function AgentsPage() {
 
                 {/* Tool Calls */}
                 {msg.toolCalls && msg.toolCalls.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-graphite/20 space-y-1">
+                  <div className="mt-2 pt-2 border-t border-eng-blue/[0.06] space-y-1.5">
                     {msg.toolCalls.map((tc) => (
                       <div
                         key={tc.id}
-                        className="flex items-center gap-2 text-xs font-mono text-steel"
+                        className="flex items-center gap-2 text-xs font-mono text-concrete"
                       >
-                        <Wrench size={10} />
-                        <span className={tc.status === "running" ? "text-accent-blue" : ""}>
+                        <Wrench size={10} className="text-alert" />
+                        <span className={tc.status === "running" ? "text-alert" : "text-eng-blue"}>
                           {tc.name}
                         </span>
                         {tc.status === "running" && (
-                          <Loader2 size={10} className="animate-spin text-accent-blue" />
+                          <Loader2 size={10} className="animate-spin text-alert" />
                         )}
                         {tc.status === "done" && <span className="text-green-600">ok</span>}
                         {tc.status === "error" && <span className="text-red-600">erro</span>}
@@ -366,7 +370,7 @@ export default function AgentsPage() {
 
                 {/* Per-message usage */}
                 {msg.usage && (
-                  <div className="mt-2 pt-1 border-t border-graphite/10 text-[10px] font-mono text-steel/60">
+                  <div className="mt-2 pt-1 border-t border-eng-blue/[0.04] text-[10px] font-mono text-concrete">
                     {msg.usage.total_input_tokens + msg.usage.total_output_tokens} tokens | ${msg.usage.total_cost_usd.toFixed(4)}
                   </div>
                 )}
@@ -379,7 +383,7 @@ export default function AgentsPage() {
         {/* Input */}
         <form
           onSubmit={handleSubmit}
-          className="flex items-center gap-3 px-6 py-3 border-t border-graphite bg-white"
+          className="flex items-center gap-3 px-6 py-3 border-t border-eng-blue/[0.06] bg-white/80 backdrop-blur-sm"
         >
           <input
             type="text"
@@ -387,12 +391,12 @@ export default function AgentsPage() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Digite uma mensagem para o agente..."
             disabled={loading}
-            className="flex-1 px-4 py-2.5 border border-graphite bg-paper text-sm placeholder:text-steel/50 focus:outline-none focus:border-accent-orange disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 border-2 border-eng-blue-10 bg-white/80 rounded-md text-sm font-sans placeholder:text-concrete/50 text-eng-blue focus:outline-none focus:border-alert focus:ring-4 focus:ring-alert-10 disabled:opacity-50 transition-all duration-300"
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="flex items-center gap-2 px-4 py-2.5 bg-ink text-white text-sm font-medium hover:bg-accent-orange transition-colors disabled:opacity-30 disabled:hover:bg-ink"
+            className="flex items-center gap-2 px-4 py-2.5 bg-alert text-white rounded-md text-sm font-sans font-semibold shadow-md shadow-glow-orange hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-30 disabled:transform-none disabled:shadow-none"
           >
             {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
             Enviar

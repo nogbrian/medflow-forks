@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ExternalLink, Maximize2, RefreshCw, Send, CheckCircle } from "lucide-react";
+import { ExternalLink, Maximize2, RefreshCw, Send, CheckCircle, Sparkles } from "lucide-react";
 import { Shell } from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,13 +61,18 @@ export default function CreativePage() {
 
   return (
     <Shell>
-      {/* Service Header */}
-      <div className="border-b border-graphite bg-white">
+      {/* Service Header - Intelligent Flow Design */}
+      <div className="border-b border-eng-blue/[0.06] bg-white/80 backdrop-blur-sm">
         <div className="px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold tracking-tight uppercase">
-              Creative Studio
-            </h1>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-alert to-orange-600 flex items-center justify-center shadow-sm shadow-glow-orange/30">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
+              <h1 className="font-display text-lg font-semibold text-eng-blue tracking-tight">
+                Creative Studio
+              </h1>
+            </div>
             <Badge variant="info">
               Gemini AI
             </Badge>
@@ -125,7 +130,7 @@ export default function CreativePage() {
       </div>
 
       {/* Iframe Container */}
-      <div className="h-[calc(100dvh-8rem)] bg-white border-x border-graphite">
+      <div className="h-[calc(100dvh-8rem)] bg-tech-white">
         <iframe
           id="creative-frame"
           src={studioUrl}

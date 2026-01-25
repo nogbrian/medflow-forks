@@ -51,18 +51,18 @@ export default function ContactsPage() {
 
   return (
     <Shell>
-      {/* Page Header */}
-      <div className="border-b border-graphite bg-white">
+      {/* Page Header - Intelligent Flow Design */}
+      <div className="border-b border-eng-blue/[0.06] bg-white/80 backdrop-blur-sm">
         <div className="px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight uppercase mb-1">
+              <h1 className="font-display text-2xl font-semibold text-eng-blue tracking-tight mb-1">
                 Contatos
               </h1>
-              <p className="font-mono text-sm text-steel">
+              <p className="font-mono text-xs text-concrete">
                 {loading
-                  ? "CARREGANDO..."
-                  : `TOTAL_REGISTROS: ${total} | OFFSET: ${offset}`}
+                  ? "Carregando..."
+                  : `${total} registros | offset ${offset}`}
               </p>
             </div>
 
@@ -83,7 +83,7 @@ export default function ContactsPage() {
         <div className="px-6 lg:px-8 pb-4 flex flex-wrap gap-3">
           <div className="flex-1 min-w-[200px] max-w-md">
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-concrete" />
               <Input
                 placeholder="Buscar por nome, email ou telefone..."
                 className="pl-10"
@@ -105,25 +105,26 @@ export default function ContactsPage() {
       </div>
 
       {/* Content */}
-      <div className="p-6 lg:p-8">
+      <div className="p-6 lg:p-8 bg-tech-white min-h-[calc(100dvh-12rem)]">
         <Card>
           <CardContent className="p-0">
             {loading ? (
-              <p className="text-sm text-steel py-12 text-center font-mono">
-                CARREGANDO CONTATOS...
-              </p>
+              <div className="py-12 flex flex-col items-center justify-center">
+                <div className="w-8 h-8 border-3 border-eng-blue/20 border-t-alert rounded-full animate-spin mb-3" />
+                <p className="text-sm text-concrete font-sans">Carregando contatos...</p>
+              </div>
             ) : error ? (
               <div className="py-12 text-center">
-                <p className="text-sm text-steel font-mono mb-4">
-                  ERRO AO CARREGAR CONTATOS
+                <p className="text-sm text-concrete font-sans mb-4">
+                  Erro ao carregar contatos
                 </p>
                 <Button variant="secondary" size="sm" onClick={() => refetch()}>
                   Tentar Novamente
                 </Button>
               </div>
             ) : contacts.length === 0 ? (
-              <p className="text-sm text-steel py-12 text-center font-mono">
-                NENHUM CONTATO ENCONTRADO
+              <p className="text-sm text-concrete py-12 text-center font-sans">
+                Nenhum contato encontrado
               </p>
             ) : (
               <Table>
@@ -158,31 +159,31 @@ export default function ContactsPage() {
                       <TableCell>
                         <div className="flex justify-end gap-1">
                           <button
-                            className="p-2 hover:bg-paper transition-colors"
+                            className="p-2 rounded-md text-concrete hover:text-alert hover:bg-alert-05 transition-all duration-300"
                             aria-label="Ligar"
                           >
                             <Phone size={14} />
                           </button>
                           <button
-                            className="p-2 hover:bg-paper transition-colors"
+                            className="p-2 rounded-md text-concrete hover:text-eng-blue hover:bg-eng-blue-05 transition-all duration-300"
                             aria-label="Email"
                           >
                             <Mail size={14} />
                           </button>
                           <button
-                            className="p-2 hover:bg-paper transition-colors"
+                            className="p-2 rounded-md text-concrete hover:text-green-600 hover:bg-green-50 transition-all duration-300"
                             aria-label="WhatsApp"
                           >
                             <MessageSquare size={14} />
                           </button>
                           <button
-                            className="p-2 hover:bg-paper transition-colors"
+                            className="p-2 rounded-md text-concrete hover:text-eng-blue hover:bg-eng-blue-05 transition-all duration-300"
                             aria-label="Agendar"
                           >
                             <Calendar size={14} />
                           </button>
                           <button
-                            className="p-2 hover:bg-paper transition-colors"
+                            className="p-2 rounded-md text-concrete hover:text-eng-blue hover:bg-eng-blue-05 transition-all duration-300"
                             aria-label="Mais opções"
                           >
                             <MoreVertical size={14} />
@@ -200,8 +201,8 @@ export default function ContactsPage() {
         {/* Pagination */}
         {!loading && contacts.length > 0 && (
           <div className="mt-4 flex items-center justify-between">
-            <span className="font-mono text-xs text-steel">
-              EXIBINDO {offset + 1}-{offset + contacts.length} DE {total} REGISTROS
+            <span className="font-mono text-xs text-concrete">
+              Exibindo {offset + 1}-{offset + contacts.length} de {total} registros
             </span>
             <div className="flex gap-2">
               <Button
